@@ -7,5 +7,5 @@ title: Dominic St-Pierre | Web Development with ASP.NET MVC, JavaScript and Node
         <h1 class="blog-title">Hi, I'm Dominic St-Pierre</h1>
         <p class="lead blog-description">A developer-entrepreneur working hard to bootstrap a successful and sustainable product business.</p>
     </div>
-    {{ include post_list.html param = site.posts limit:9 }}
+    {% include post_list.html param = site.posts limit:9 %}
 </div><!-- /.container -->
