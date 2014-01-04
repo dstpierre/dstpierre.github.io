@@ -4,11 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      {% capture description %}
-        {% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}
-      {% endcapture %}
-      <meta content="{{ description }}" property='og:description' />
-      <meta name="description" content="{{ description }}" />
+      <meta name="description" content="{{ page.description }}" />
     <meta name="author" content="Dominic St-Pierre" />
     <link rel="shortcut icon" href="/assets/img/favicon.ico" />
 
