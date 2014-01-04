@@ -1,57 +1,48 @@
-<!DOCTYPE html>
-<html class="fuelux" lang="en">
+﻿<!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>{{ page.title }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link href="http://fuelcdn.com/fuelux/2.2/css/fuelux.css" rel="stylesheet" /> 
-	<link href="http://fuelcdn.com/fuelux/2.2/css/fuelux-responsive.css" rel="stylesheet" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
-	<script src="http://fuelcdn.com/fuelux/2.2/loader.min.js" type="text/javascript"></script>
-    <link href="/css/docs.css" rel="stylesheet">
-    <link href="/js/google-code-prettify/prettify.css" rel="stylesheet">	
-	<link rel="shortcut icon" href="/favicon.ico">    
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      {% capture description %}
+        {% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}
+      {% endcapture %}
+      <meta content="{{ description }}" property='og:description' />
+      <meta name="description" content="{{ description }}" />
+    <meta name="author" content="Dominic St-Pierre" />
+    <link rel="shortcut icon" href="/assets/img/favicon.ico" />
+
+    <title>
+        {% if page.title %}
+            {{ page.title }}
+        {% else %}
+            Dominic St-Pierre
+        {% endif %}
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/css/blog.css" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
   </head>
-  <body data-spy="scroll" data-target=".subnav" data-offset="50">
-	{% include navigation.html %}  
-	<div class="container">	
-		<div class="marketing">
-		{{ content }}
-		</div>		 
-	 </div>   
-	{% include footer.html %}
-    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>    
-    
-	<script src="/js/custom.js" type="text/javascript"></script>	
-	
-	<script type="text/javascript">
-		/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-		var disqus_shortname = 'ericjones'; // required: replace example with your forum shortname
 
-		/* * * DON'T EDIT BELOW THIS LINE * * */
-		(function () {
-			var s = document.createElement('script'); s.async = true;
-			s.type = 'text/javascript';
-			s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
-			(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-		}());
-	</script>
-	
-	<!-- Google Analytics -->
-	<script type="text/javascript">
+  <body>
 
-	  var _gaq = _gaq || [];
-	  _gaq.push(['_setAccount', 'UA-29830549-1']);
-	  _gaq.push(['_trackPageview']);
+    {{ content }}
 
-	  (function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	  })();
+    <div class="blog-footer">
+      <p>Blog template built for <a href="http://getbootstrap.com">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+      <p>
+        <a href="#">Back to top</a>
+      </p>
+    </div>
 
-	</script>	
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
   </body>
 </html>

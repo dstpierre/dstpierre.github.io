@@ -1,4 +1,9 @@
-auto: true
-markdown: rdiscount
-pygments: true
-permalink: /blog/:title
+name: Dominic St-Pierre
+description: Dominic St-Pierre's Blog
+url: http://dstpierre.github.io
+markdown: redcarpet
+pygments: false
+safe: true
+permalink: pretty
+author: Dominic St-Pierre
+email: dominicstpierre@gmail.com
