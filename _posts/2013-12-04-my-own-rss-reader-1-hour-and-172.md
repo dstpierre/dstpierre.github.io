@@ -4,6 +4,7 @@ title: My own RSS reader in 1 hour and 172 line of JavaScript
 date: 2013-12-04 17:42:20 UTC
 updated: 2013-12-04 17:42:20 UTC
 comments: false
+categories: open-source
 tags: javascript
 ---
 
