@@ -23,6 +23,10 @@ layout: layout
                     {% if page.summary %}
                     <p>{{ page.summary }}</p>
                     {% endif %}
+
+                    <p class="well">
+                        {{ page.summary }}
+                    </p>
                 </div>
                 <div class="col-md-4 blog-sidebar">
                     <div class="sidebar-module sidebar-module-inset">
@@ -56,6 +60,10 @@ layout: layout
             </div>
             <script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
             <!-- AddToAny END -->
+            <p>&nbsp;</p>
+            <h4>Related posts</h4>
+            {% include post_list.html param = site.related_posts %}
+            <p>&nbsp;</p>
         </div>
     </div>
     <div class="row">
@@ -77,7 +85,7 @@ layout: layout
         <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
         {% else %}
-        <p>Comment are not active for this post.</p>
+        <p>Comments are not active for this post.</p>
         {% endif %}
     </div>
 </div>

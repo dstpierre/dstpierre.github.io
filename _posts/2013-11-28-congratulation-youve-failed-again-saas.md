@@ -1,9 +1,12 @@
 ---
 layout: post
-title: Congratulation you’ve failed again (SaaS)
+title: "Congratulation you’ve failed again (SaaS)"
 date: 2013-11-28 13:43:21 UTC
 updated: 2013-11-28 13:43:21 UTC
-comments: false
+comments: true
+summary: "Yet another failure with lots of lessons learned."
+image: "congrats-you-failed-again.png"
+categories: bootstrapping
 tags: micropreneur
 ---
 

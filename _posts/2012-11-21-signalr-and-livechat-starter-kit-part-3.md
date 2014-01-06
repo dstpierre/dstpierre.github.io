@@ -3,9 +3,15 @@ layout: post
 title: "SignalR and LiveChat Starter Kit Part 3: Visitor Experience"
 date: 2012-11-21 22:53:50 UTC
 updated: 2012-11-21 22:53:50 UTC
-comments: false
+comments: true
+summary: "Video series showing the rewrite process of LCSK using SignalR."
+image: "lcsk-3.jpg"
+categories: open-source
 tags: lcsk signalr
 ---
+
+> Please note that this video was using the first beta version of SignalR, lots of things changes 
+> since that day.
 
 The version 1.5 of [LCSK](http://livechatstarterkit.codeplex.com) was not
 doing a bad job in terms of presenting a relatively interesting experience to

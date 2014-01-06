@@ -1,9 +1,12 @@
 ---
 layout: post
-title: 50k unique visitors in 3 days with a 3 years old article
+title: "50k unique visitors in 3 days with a 3 years old article"
 date: 2013-12-19 22:10:36 UTC
 updated: 2013-12-19 22:10:36 UTC
-comments: false
+comments: true
+summary: "Getting 50k visitors in 3 days is always exciting, but for a 3 years old post it's even cooler."
+image: "traffic-spike.png"
+categories: bootstrapping
 tags: micropreneur
 --- 
 

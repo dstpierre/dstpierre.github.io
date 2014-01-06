@@ -1,11 +1,17 @@
 ---
 layout: post
-title: SignalR and LiveChat Starter Kit video series
+title: "SignalR and LiveChat Starter Kit video series"
 date: 2012-11-16 21:47:18 UTC
 updated: 2012-11-16 21:47:18 UTC
-comments: false
+comments: true
+summary: "Video series showing the rewrite process of LCSK using SignalR."
+image: "lcsk-1.jpg"
+categories: open-source
 tags: lcsk signalr
 ---
+
+> Please note that this video was using the first beta version of SignalR, lots of things changes 
+> since that day.
 
 This is the first post of a series on the rewrite of [LiveChat Starter
 Kit](http://livechatstarterkit.codeplex.com) to version 2 using

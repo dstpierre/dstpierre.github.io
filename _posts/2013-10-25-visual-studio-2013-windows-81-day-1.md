@@ -1,10 +1,13 @@
 ---
 layout: post
-title: Visual Studio 2013 & Windows 8.1 day 1
+title: "Visual Studio 2013 & Windows 8.1 day 1"
 date: 2013-10-25 00:31:21 UTC
 updated: 2013-10-25 00:31:21 UTC
-comments: false
-tags: visual-studio
+comments: true
+summary: "My first day using Windows 8.1 and Visual Studio 2013. I rarely rant, but this post is one."
+image: "mswmp-link-error.png"
+categories: tips
+tags: visual-studio windows
 ---
 
 Visual Studio 2013 released on October 17th 2013, I decided to give it a try

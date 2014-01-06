@@ -1,5 +1,6 @@
 name: Dominic St-Pierre
 description: Dominic St-Pierre's Blog
+markdown: redcarpet
 timezone: America/Montreal
 permalink: /:year/:month/:title.html
 url: http://dstpierre.github.io

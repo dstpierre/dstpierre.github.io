@@ -1,9 +1,11 @@
 ---
 layout: post
-title: LiveChat Starter Kit v2 is in development
+title: "LiveChat Starter Kit v2 is in development"
 date: 2012-11-12 14:25:09 UTC
 updated: 2012-11-12 14:25:09 UTC
-comments: false
+comments: true
+summary: "The rewrites of LCSK using SignalR as the communication mechasim."
+categories: open-source
 tags: lcsk
 ---
 

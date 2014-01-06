@@ -3,7 +3,9 @@ layout: post
 title: ASP.NET MVC Multilingual websites
 date: 2012-11-12 16:37:50 UTC
 updated: 2012-11-12 16:37:50 UTC
-comments: false
+comments: true
+summary: "A complete ASP.NET MVC multilingual site covering database and querying data, controller and views, images and javascript."
+categories: web
 tags: asp-net mvc
 ---
 
@@ -26,14 +28,14 @@ creation and last modification etc. Those meta information does not need to be
 translated. The page title, URL and the page body content on the other hand
 needs to be translated. You might end up with the following tables layout:
 
-|Pages|PageContent
-}----|----|
+|Pages|PageContent|
+|----|----|
 |id|PageId|
 |ParentId|Culture|
 |CreatedBy|URL|
 |Created|Title|
 |ModifiedBy|Body|
-|Modified||
+|Modified| |
 
 That way you can have 2 or 20 translated version of a page without repeating
 the non-translated information. You might also consider adding an index to the
@@ -44,7 +46,7 @@ Culture field since you would probably have lots of filtering by that field.
 I’m usually using the simple {lang} parameter to differentiate the route in a
 website with multiple language supported.
 
-```csharp    
+```c#    
     routes.MapRoute(  
       name: "ML",  
       url: "{lang}/{controller}/{action}/{id}",  
@@ -66,7 +68,7 @@ us/library/system.threading.thread.currentculture.aspx) and
 [CurrentUICulture](http://msdn.microsoft.com/en-
 us/library/system.threading.thread.currentuiculture.aspx) appropriately:
 
-```csharp    
+```c#    
     protected string Language { get; set; }  
       
     protected override void OnActionExecuting(ActionExecutingContext filterContext)  
@@ -101,40 +103,40 @@ filtered in the right culture.
 
   
 
-```csharp    
-       1:  public PageController : BaseController
+```c#
+     public PageController : BaseController
     
-       2:  {
+     {
     
-       3:    private IPageRepository pages = null;
+       private IPageRepository pages = null;
     
-       4:  &nbsp_place_holder;
+     &nbsp_place_holder;
     
-       5:    public PageController() : this(new SqlPageRepository()) { }
+       public PageController() : this(new SqlPageRepository()) { }
     
-       6:  &nbsp_place_holder;
+     &nbsp_place_holder;
     
-       7:    public PageController(IPageRepository repo)
+       public PageController(IPageRepository repo)
     
-       8:    {
+       {
     
-       9:      pages = repo;
+         pages = repo;
     
-      10:    }
+       }
     
-      11:  &nbsp_place_holder;
+     &nbsp_place_holder;
     
-      12:    public ActionResult Show(string id)
+       public ActionResult Show(string id)
     
-      13:    {
+       {
     
-      14:      var vm = pages.Get(id, Language);
+         var vm = pages.Get(id, Language);
     
-      15:      return View(vm);
+         return View(vm);
     
-      16:     }
+        }
     
-      17:  }
+     }
 ```
 
 On line 1 by inheriting from the BaseController the Language property will be

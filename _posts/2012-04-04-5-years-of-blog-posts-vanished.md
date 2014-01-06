@@ -1,9 +1,10 @@
 ---
 layout: post
-title: 5 years of blog posts vanished
+title: "5 years of blog posts vanished"
 date: 2012-04-04 11:26:37 UTC
 updated: 2012-04-04 11:26:37 UTC
 comments: false
+summary: "5 years of blog posts lost. 300ish posts written since 2007."
 --- 
 
 I guess those things happen one day or another if you are not careful with

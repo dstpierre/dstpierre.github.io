@@ -1,9 +1,12 @@
 ---
 layout: post
-title: Enable Code First Migrations check box is hidden from Publishing Wizard
+title: "Enable Code First Migrations check box is hidden from Publishing Wizard"
 date: 2012-11-15 10:25:08 UTC
 updated: 2012-11-15 10:25:08 UTC
-comments: false
+comments: true
+summary: "Sometimes the check box for Code First Entity Framework is not present in the Publish Wizzared dialog. Here's why."
+image: "without-code-first.png"
+categories: tips
 tags: azure
 --- 
 

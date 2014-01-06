@@ -3,9 +3,15 @@ layout: post
 title: "SignalR and LiveChat Starter Kit Part 2: Agent Panel"
 date: 2012-11-19 20:47:25 UTC
 updated: 2012-11-19 20:47:25 UTC
-comments: false
+comments: true
+summary: "Video series showing the rewrite process of LCSK using SignalR."
+image: "lcsk-2.jpg"
+categories: open-source
 tags: lcsk signalr
 ---
+
+> Please note that this video was using the first beta version of SignalR, lots of things changes 
+> since that day.
 
 SignalR is so exciting. I cannot think of how it could have been easier to
 achieve that level of real-time communication in the past. I’ve started

@@ -3,7 +3,9 @@ layout: post
 title: LiveChat Starter Kit 2.0.3 release
 date: 2013-02-24 14:17:08 UTC
 updated: 2013-02-24 14:17:08 UTC
-comments: false
+comments: true
+summary: "First release of LCSK using SignalR, no database and single folder deployment."
+categories: open-source
 tags: lcsk
 ---
 
