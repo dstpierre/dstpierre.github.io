@@ -6,16 +6,32 @@ title: test
 {% include nav.html param="home" %}
 
 <div class="container">
-	<div class="blog-header">
-		<h1 class="blog-title">Hi. I'm Dominic St-Pierre.</h1>
-		<p class="lead blog-description">
-            A developer, entrepreneur. Since 2008 I bootstraped, failed and sold some SaaS apps like 
-            <a href="https://www.getosmosis.com">Osmosis</a>, <a href="https://www.bunkerapp.com">Bunker</a> and
-            <a href="/2013/11/congratulation-youve-failed-again-saas.html">some others</a>. 
-            I'm now listening my enthusiasts and see where it will drive me. I care for many Open Source projects 
-            and still maintained my old 2007 <a href="https://github.com/dstpierre/lcsk">LiveChat Starter Kit</a> project.
-        </p>
-	</div>
+    <div class="row">
+        <div class="col-md-11">
+            <div class="blog-header">
+                <h1 class="blog-title">Hi. I'm Dominic St-Pierre.</h1>
+                <p class="lead blog-description">
+                    A developer, entrepreneur. Since 2008 I bootstraped, failed and sold some SaaS apps like
+                    <a href="https://www.getosmosis.com">Osmosis</a>, <a href="https://www.bunkerapp.com">Bunker</a> and
+                    <a href="/2013/11/congratulation-youve-failed-again-saas.html">some others</a>.
+                    I'm now listening my enthusiasts and see where it will drive me. I care for many Open Source projects
+                    and still maintained my old 2007 <a href="https://github.com/dstpierre/lcsk">LiveChat Starter Kit</a> project.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-1">
+            <p>
+                <img class="img-responsive" src="/assets/img/me.jpg" alt="Dominic St-Pierre" />
+            </p>
+            <!-- Place this tag where you want the widget to render. -->
+            <div class="g-follow" data-annotation="none" data-height="20" data-href="//plus.google.com/110937687841710480769" data-rel="author"></div>
+            <p>
+                <a href="https://twitter.com/dominicstpierre" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @dominicstpierre</a>
+                <script>!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + '://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); } }(document, 'script', 'twitter-wjs');</script>
+            </p>
+        </div>
+    </div>
+	
     <div class='row'>
         {% for post in site.posts limit:9 %}
         <div class="col-sm-4">
@@ -48,3 +64,11 @@ title: test
     </div>
 </div>
 
+<!-- Place this tag after the last widget tag. -->
+<script type="text/javascript">
+    (function () {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/platform.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+    })();
+</script>
