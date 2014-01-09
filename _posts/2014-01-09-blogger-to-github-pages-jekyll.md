@@ -61,7 +61,7 @@ I decided to have one category per post and multiple tags. You can go whichever 
 tag pages are very similar, here's a snippet of my lcsk tag page:
 
 ```html
-{% include nav.html %}
+{{ "{% include nav.html " }}%}
 
 <div class="container">
     <div class="blog-header">
@@ -71,7 +71,7 @@ tag pages are very similar, here's a snippet of my lcsk tag page:
         </p>
     </div>
 
-    {% include post_list.html param = site.tags.lcsk %}
+    {{ "{% include post_list.html param = site.tags.lcsk " }}%}
 </div>
 ```
 
@@ -79,34 +79,34 @@ And here's the post_list.html:
 
 ```html
 <div class='row'>
-    {% for post in include.param %}
+    {{ "{% for post in include.param " }}%}
     <div class="col-sm-4">
         <h4>
-            <a href="{{ post.url }}">
-                {{ post.title }}
+            <a href="{{ "{{ post.url " }}}}">
+                {{ "{{ post.title " }}}}
             </a>
         </h4>
         <p>
             <small>
-                <span class="glyphicon glyphicon-calendar"></span> {{ post.date | date: "%A, %B %d, %y" }} &mdash;
-                {% for tag in post.tags %}
-                {% unless forloop.last %}
-                <span class="glyphicon glyphicon-tag"></span> <a href="/tags/{{tag}}">{{tag}}</a> |
-                {% else %}
-                <span class="glyphicon glyphicon-tag"></span> <a href="/tags/{{tag}}">{{tag}}</a>
-                {% endunless %}
-                {% endfor %}
+                <span class="glyphicon glyphicon-calendar"></span> {{ "{{ post.date | date: '%A, %B %d, %y' " }}}} &mdash;
+                {{ "{% for tag in post.tags " }}%}
+                {{ "{% unless forloop.last " }}%}
+                <span class="glyphicon glyphicon-tag"></span> <a href="/tags/{{ "{{tag " }}}}">{{ "{{tag" }}}}</a> |
+                {{ "{% else " }}%}
+                <span class="glyphicon glyphicon-tag"></span> <a href="/tags/{{ "{{tag " }}}}">{{ "{{tag " }}}}</a>
+                {{ "{% endunless " }}%}
+                {{ "{% endfor " }}%}
             </small>
         </p>
         <p class="post-summary">
-            {%if post.image %}
-            <a href='{{post.url}}'><img src="/images/{{post.image}}" style="max-height: 160px;overflow:hidden" /></a>
-            {% else %}
-            {{post.summary}}
-            {% endif %}
+            {{ "{% if post.image " }}%}
+            <a href='{{ "{{post.url " }}}}'><img src="/images/{{ "{{post.image " }}}}" style="max-height: 160px;overflow:hidden" /></a>
+            {{ "{% else " }}%}
+            {{ "{{post.summary " }}}}
+            {{ "{% endif " }}%}
         </p>
     </div>
-    {% endfor %}
+    {{ "{% endfor " }}%}
 </div>
 ```
 
@@ -116,7 +116,7 @@ reusing the same HTML for repeating post across all tag and category pages.
 #### Step 3: Debugging Jekyll in Windows, ho boy.
 
 I’ve looked at couple of resources, but nothing was really appealing. After a couple of pushes, the site 
-broke completely and the page directives like '{% include nav.html %}' were not interpreted anymore.
+broke completely and the page directives like '{{ "{% include nav.html " }}%}' were not interpreted anymore.
 
 I compared, re-check, carefully looked at every lines of HTML. I was not able to find the source of the problem.
 
@@ -155,8 +155,8 @@ yet, the directive was *still* not interpreted.
 
 ### Saturday 5am, now I’m ready to make this work
 
-I started by removing all kinds of things, from '{% include %}' to letting only HTML with only 
-a '{{ page.title }}'. No compile error but Jekyll was not rendering properly.
+I started by removing all kinds of things, from '{{ "{% include " }}%}' to letting only HTML with only 
+a '{{ "{{ page.title " }}}}'. No compile error but Jekyll was not rendering properly.
 
 I than decided to start from scratch. New layout page, new includes, new index page. At guess what, 
 it **worked**.
