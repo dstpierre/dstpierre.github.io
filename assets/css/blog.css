@@ -154,6 +154,10 @@ h6, .h6 {
   color: #999;
 }
 
+.post-summary {
+    padding-bottom: 15px;
+}
+
 
 /*
  * Footer

@@ -3,8 +3,7 @@ description: Dominic St-Pierre's Blog
 markdown: redcarpet
 timezone: America/Montreal
 permalink: /:year/:month/:title.html
-url: http://dstpierre.github.io
-markdown: redcarpet
+url: http://www.dominicstpierre.com
 pygments: false
 safe: true
 author: Dominic St-Pierre
