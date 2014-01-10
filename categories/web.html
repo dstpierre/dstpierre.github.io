@@ -1,0 +1,17 @@
+---
+layout: layout
+title: Web
+---
+
+{% include nav.html param="web" %}
+
+<div class="container">
+	<div class="blog-header">
+	<h1>Web</h1>
+	<p class="lead blog-description">
+	    I'm a web developer. Here's my post related to the web.
+	</p>
+	</div>
+
+	{% include post_list.html param = site.categories.web %}
+</div>
