@@ -150,6 +150,10 @@ h6, .h6 {
         padding-bottom: 10px;
     }
 
+    .blog-post a {
+        color: #740303;
+    }
+
 .blog-post-title {
   margin-bottom: 5px;
   font-size: 40px;
