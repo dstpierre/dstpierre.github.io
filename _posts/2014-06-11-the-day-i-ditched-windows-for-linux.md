@@ -7,15 +7,25 @@ comments: true
 summary: "I've been developing in C# on Windows for the last 14 years and today is the day I decided enough is enough."
 image: "linux-desktop.png"
 categories: tips
-tags: linux, windows
+tags: linux windows
 ---
 
-![simple C color inverter][/images/linux-desktop.png]
+![simple C color inverter](/images/linux-desktop.png "simple C color inverter")
 
 My main source of revenue is by getting paid to architect and develop C# software 
 for companies running in Windows infrastructure. Still, since I installed Windows 8 
 when it launched, I've been slowed down by my OS. I'm not writing this to start any 
 kind of OS war whatsoever. Its just that I decided to try something else.
+
+Now, I've not _totally abandoned_ Windows. It is required in my consulting job. But 
+if you are like me and appreciate learning new programming languages and trying 
+all kind of technologies, you might want to try this as well. As I've tweeted a 
+couple of days ago:
+
+>> How many billable hours #Windows8 makes you lost before you decided to switch to another
+>> OS? I'm yet again in a nothing's working situation.
+
+It is not something that you do without preparation though. Here is how I did it.
 
 ### I tried to switch before
 
