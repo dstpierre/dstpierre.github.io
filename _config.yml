@@ -1,10 +1,41 @@
-name: Dominic St-Pierre
-description: Dominic St-Pierre's Blog
-markdown: redcarpet
-timezone: America/Montreal
-permalink: /:year/:month/:title.html
-url: http://www.dominicstpierre.com
-pygments: true
-safe: true
-author: Dominic St-Pierre
-email: dominicstpierre@gmail.com
+# Site settings
+title:       Dominic St-Pierre
+email:       dominicstpierre@gmail.com
+author:      Dominic St-Pierre
+description: "Developer / entrepreneur, I blog about my journey as a software engineer / self-funded entrepreneur."
+baseurl:     ""
+url:         "http://www.dominicstpierre.com"
+
+# Google analytics
+google_analytics:
+
+# Optional features
+animated:           false
+show_related_posts: true
+show_post_footers:  true
+
+# Disqus post comments
+# (leave blank to disable Disqus)
+disqus_shortname: dominicstpierre
+
+# Social icons
+show_social_icons: true
+github_username:  dstpierre
+stackoverflow_id: Dominic St-Pierre
+twitter_username: dominicstpierre
+google_plus_id:
+linkedin_username:
+bitcoin_url:
+paypal_url:
+flattr_button:
+
+# Build settings
+markdown:     kramdown
+redcarpet:
+  extensions: ['smart', 'tables', 'with_toc_data']
+permalink:    pretty
+paginate:     3
+sass:
+  compressed: true
+gems:
+  - jekyll-sitemap
