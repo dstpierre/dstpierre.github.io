@@ -3,18 +3,25 @@ layout: layout
 title: Tips
 ---
 
-{% include nav.html param="web" %}
-
-<div class="container">
-	<div class="blog-header">
+<div class="home">
 	<h1>Helpful tips (hopefully)</h1>
 	<p class="lead blog-description">
-	    These are posts I wrote after completing a task taht I had lots of 
-        blocking moment or hard time figuring out WTH was going on. I can refer to 
-        them later if I need to do that task again. Hopefully they would be useful 
-        to others as well.
+		These are posts I wrote after completing a task taht I had lots of
+		blocking moment or hard time figuring out WTH was going on. I can refer to
+		them later if I need to do that task again. Hopefully they would be useful
+		to others as well.
 	</p>
+	<div class="posts">
+		{% for post in paginator.posts %}
+		<div class="post">
+			<a href="{{ post.url | prepend: site.baseurl }}" class="post-link">
+				<p class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</p>
+				<h3 class="h2 post-title">{{ post.title }}</h3>
+				<p class="post-summary">{{ post.summary }}</p>
+			</a>
+		</div>
+		{% endfor %}
 	</div>
 
-	{% include post_list.html param = site.categories.tips %}
+	{% include pagination.html %}
 </div>

@@ -3,16 +3,23 @@ layout: layout
 title: "Microsoft Windows"
 ---
 
-{% include nav.html %}
-
-<div class="container">
-	<div class="blog-header">
+<div class="home">
 	<h1>Microsoft Windows</h1>
 	<p class="lead blog-description">
-	    When you're paid to write/work on .NET apps, you're better 
-        have a Windows OS in good shape.
+		When you're paid to write/work on .NET apps, you're better
+		have a Windows OS in good shape.
 	</p>
+	<div class="posts">
+		{% for post in paginator.posts %}
+		<div class="post">
+			<a href="{{ post.url | prepend: site.baseurl }}" class="post-link">
+				<p class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</p>
+				<h3 class="h2 post-title">{{ post.title }}</h3>
+				<p class="post-summary">{{ post.summary }}</p>
+			</a>
+		</div>
+		{% endfor %}
 	</div>
 
-	{% include post_list.html param = site.tags.windows %}
+	{% include pagination.html %}
 </div>

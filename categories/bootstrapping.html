@@ -3,16 +3,23 @@ layout: layout
 title: "Bootstrapping"
 ---
 
-{% include nav.html param="web" %}
-
-<div class="container">
-	<div class="blog-header">
+<div class="home">
 	<h1>Bootstrapping a software product</h1>
-	<p class="lead blog-description">
-	    Ha! Bootstrapping a software product is such an exciting 
-        journey. One day I will succeed, I will never stop trying.
+	<p>
+		Ha! Bootstrapping a software product is such an exciting
+		journey. One day I will succeed, I will never stop trying.
 	</p>
+	<div class="posts">
+		{% for post in paginator.posts %}
+		<div class="post">
+			<a href="{{ post.url | prepend: site.baseurl }}" class="post-link">
+				<p class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</p>
+				<h3 class="h2 post-title">{{ post.title }}</h3>
+				<p class="post-summary">{{ post.summary }}</p>
+			</a>
+		</div>
+		{% endfor %}
 	</div>
 
-	{% include post_list.html param = site.categories.bootstrapping %}
+	{% include pagination.html %}
 </div>
