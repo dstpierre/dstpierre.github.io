@@ -4,7 +4,12 @@ email:       dominicstpierre@gmail.com
 author:      Dominic St-Pierre
 description: "Developer / entrepreneur, I blog about my journey as a software engineer / self-funded entrepreneur."
 baseurl:     ""
-url:         "http://www.dominicstpierre.com"
+timezone: America/Montreal
+permalink: /:year/:month/:title.html
+url: http://www.dominicstpierre.com
+pygments: false
+pygments: true
+safe: true
 
 # Google analytics
 google_analytics:
