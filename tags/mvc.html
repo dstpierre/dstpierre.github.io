@@ -1,0 +1,18 @@
+---
+layout: layout
+title: "MVC"
+---
+
+{% include nav.html %}
+
+<div class="container">
+	<div class="blog-header">
+	<h1>Model View Controller</h1>
+	<p class="lead blog-description">
+	    As much as I'd loved to switch to C# from Vb 6, I was excited to switch 
+        to ASP.NET MVC when it launch. Now I just cannot touch a web form app.
+	</p>
+	</div>
+
+	{% include post_list.html param = site.tags.mvc %}
+</div>

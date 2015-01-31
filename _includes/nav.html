@@ -1,0 +1,11 @@
+<div class="blog-masthead">
+    <div class="container">
+        <nav class="blog-nav">
+            <a class="blog-nav-item {% if include.param == 'home' %}active{% endif %}" href="/">home</a>
+            <a class="blog-nav-item {% if include.param == 'about' %}active{% endif %}" href="/about">about me</a>
+            {% for cat in site.categories %}
+            <a class="blog-nav-item {% if include.param == cat | first %}active {% endif %}" href="/categories/{{ cat | first }}">{{ cat | first }}</a>
+            {% endfor %}
+        </nav>
+    </div>
+</div>

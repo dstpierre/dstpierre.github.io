@@ -1,0 +1,17 @@
+---
+layout: layout
+title: "Jekyll"
+---
+
+{% include nav.html %}
+
+<div class="container">
+	<div class="blog-header">
+	<h1>Jekyll</h1>
+	<p class="lead blog-description">
+	    My blog run on GitHub Pages and Jekyll now.
+	</p>
+	</div>
+
+	{% include post_list.html param = site.tags.jekyll %}
+</div>
