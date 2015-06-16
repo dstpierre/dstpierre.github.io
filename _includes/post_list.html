@@ -2,7 +2,7 @@
     {% for post in include.param %}
     <div class="col-sm-4">
         <h4 class="post-title">
-            <a href="{{ post.url }}">
+            <a href="{{ post.url }}" title="{{ post.title }}">
                 {{ post.title }}
             </a>
         </h4>
