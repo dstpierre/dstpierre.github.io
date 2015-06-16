@@ -5,7 +5,7 @@ title: "Dominic St-Pierre | About Me"
 
 {% include nav.html param="about" %}
 
-<div class="container">
+<div class="container blog-main">
     <div class="row">
         <div class="col-md-10">
             <div class="blog-header">
@@ -85,9 +85,10 @@ Let me know if you want more information.
 </p>
 </div>
 <div class="col-sm-1 col-md-6">
-<form id="contact-form" role="form">
+  <h3>Contact me</h3>
+<form id="contact-form" role="form" method="post">
   <input type="email" name="_replyto" class="form-control" placeholder="Your email">
-  <textarea name="body" class="form-control" placeholder="Your message"></textarea>
+  <textarea name="body" style="width: 100%;height: 100px;" class="form-control" placeholder="Your message"></textarea>
   <input type="submit" class="btn btn-primary" value="Send">
 </form>
 </div>
