@@ -1,0 +1,1620 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:excerpt="http://wordpress.org/export/1.2/excerpt/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wp="http://wordpress.org/export/1.2/">
+  <channel>
+    <title>Dominic St-Pierre</title>
+    <link>http://dominicstpierre.com</link>
+    <description>Dominic St-Pierre's Blog</description>
+    <pubDate/>
+    <language/>
+    <wp:wxr_version>1.2</wp:wxr_version>
+    <wp:base_site_url>http://dominicstpierre.com</wp:base_site_url>
+    <wp:base_blog_url>http://dominicstpierre.com</wp:base_blog_url>
+    <wp:author>
+      <wp:author_login></wp:author_login>
+      <wp:author_email>dominicstpierre@gmail.com</wp:author_email>
+      <wp:author_display_name><![CDATA[Dominic St-Pierre]]></wp:author_display_name>
+      <wp:author_first_name><![CDATA[Dominic]]></wp:author_first_name>
+      <wp:author_last_name><![CDATA[St-Pierre]]></wp:author_last_name>
+    </wp:author>
+    <generator>http://dominicstpierre.com</generator>
+    <image>
+    	<url>http://dominicstpierre.com/images/site-logo.png</url>
+    	<title>Dominic St-Pierre</title>
+      <link>http://dominicstpierre.com</link>
+    </image>
+
+
+      <item>
+        <title><![CDATA[Deploying Go apps to Azure Web Apps is now easy]]></title>
+        <link>http://dominicstpierre.com/2015/11/deploying-go-app-to-azure-is-now-easy.html</link>
+        <pubDate>2015-11-13T06:44:00-05:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p><img src="/images/go-azure-deployment.png" alt="Go editing with atom" title="Go editing with atom"></p>
+
+<p>You know when you do something by habits and don&#39;t really have time to see if there&#39;s a better way to do it?</p>
+
+<p>That&#39;s exactly what I was doing regarding my Go deployment to my Azure Web Apps.</p>
+
+<h3>Manual deployment</h3>
+
+<p>Here were my flow for deploying a Go program to Azure Web Apps.</p>
+
+<ol>
+<li>Development</li>
+<li>Git push to Github</li>
+<li><code>go test</code> and <code>go build</code></li>
+<li>I had a web.config that specified that I was deploying an httpPlateformHandler app.</li>
+<li>Was incrementing the exe&#39;s filename =&gt; v-0.0.1, v-0.0.2</li>
+<li>Was FTPing to Azure Web Apps and sending the new exe with web.config updated app</li>
+</ol>
+
+<p>The last steps was automatically picking the new exe as the new app to handle requests.</p>
+
+<p>Here&#39;s the web.config that I had.</p>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+  <span class="nt">&lt;system.web&gt;</span>
+        <span class="nt">&lt;customErrors</span> <span class="na">mode=</span><span class="s">"Off"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/system.web&gt;</span>
+    <span class="nt">&lt;system.webServer&gt;</span>
+        <span class="nt">&lt;handlers&gt;</span>
+            <span class="nt">&lt;add</span> <span class="na">name=</span><span class="s">"httpplatformhandler"</span> <span class="na">path=</span><span class="s">"*"</span> <span class="na">verb=</span><span class="s">"*"</span> <span class="na">modules=</span><span class="s">"httpPlatformHandler"</span> <span class="na">resourceType=</span><span class="s">"Unspecified"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/handlers&gt;</span>
+        <span class="nt">&lt;httpPlatform</span> <span class="na">stdoutLogEnabled=</span><span class="s">"true"</span> <span class="na">processPath=</span><span class="s">"d:\home\site\wwwroot\v-0.0.10.exe"</span>
+                      <span class="na">arguments=</span><span class="s">""</span>
+                      <span class="na">startupTimeLimit=</span><span class="s">"60"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;environmentVariables&gt;</span>
+              <span class="nt">&lt;environmentVariable</span> <span class="na">name=</span><span class="s">"GOROOT"</span> <span class="na">value=</span><span class="s">"d:\home\site\wwwroot\go"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;/environmentVariables&gt;</span>
+        <span class="nt">&lt;/httpPlatform&gt;</span>
+    <span class="nt">&lt;/system.webServer&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div>
+<p>Although this was taking me like 45-60 seconds of manual commands, it was fairly quick to have a new version in production.</p>
+
+<h3>Then I needed to implement websocket</h3>
+
+<p>I&#39;m currently porting some Node apps and I needed to have websocket handler. On Node when you want to enable websocket you need to eneable it on the Azure portal, and you need to add this to your <code>web.config</code>:</p>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;webSocket</span> <span class="na">enabled=</span><span class="s">"false"</span> <span class="nt">/&gt;</span>
+</code></pre></div>
+<p>So I try that and deployed my Go app, was not working, I tried to removed it and it was not working as well.</p>
+
+<p>Long story short, I exhausted all my idea and start fearing that Azure websocket and Go app were not going to play nicely. Than I posted a <a href="http://stackoverflow.com/questions/33675348/azure-websocket-not-working-with-go-httpplatformhandler/33684891#33684891">StackOverflow question</a>.</p>
+
+<p><strong>Xiaomin Wu</strong> replied and I was shocked to see on his Github repo the presence of the Azure button &quot;Deploy to Azure&quot; and he also mentioned that he did not created any <code>web.config</code>.</p>
+
+<blockquote>
+<p>What? Can we just <code>git push</code> to Azure for Go app now?</p>
+</blockquote>
+
+<h3>Deploying Go app on Azure is now as easy as a C# or Node app</h3>
+
+<p>I than plugged my Azure Web App to my Github repository and tried to deploy. <strong>It worked</strong>.</p>
+
+<p>This is a major improvement in the flow of deploying changes to production.</p>
+
+<p>I compared the <code>web.config</code> that is automatically created by Kudu with mine and there&#39;s not much difference. Still don&#39;t really understand why my manual deployment did not work with websocket, but I&#39;m just glad we can now deploy Go apps to Azure from a <code>git push</code>.</p>
+
+<p><strong>Flow is now</strong>:</p>
+
+<ol>
+<li>Developement</li>
+<li><code>go test</code></li>
+<li><code>git push</code></li>
+</ol>
+
+<h3>Been loving Go so far</h3>
+
+<p>This past year was super exciting for me in terms of technologies that I had the chance to discover and work  with. Go is the most recent for me in production and so far I like it very much.</p>
+
+<p>The learning curve is steep, especially from someone like me that&#39;s coming from a ~15 year C# background.</p>
+
+<p>But I think it is making me become a better programmer, and it has been a long time since I felt this from a language.</p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2015/11/deploying-go-app-to-azure-is-now-easy</wp:post_id>
+        <wp:post_date>2015-11-13T06:44:00-05:00</wp:post_date>
+        <wp:post_date_gmt>2015-11-13T06:44:00-05:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename="go"><![CDATA[["go",]]></category>
+
+          <category domain="post_tag" nicename="azure"><![CDATA["azure"]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+      <item>
+        <title><![CDATA[Visual Studio Code on Arch Linux, just wow]]></title>
+        <link>http://dominicstpierre.com/2015/04/visual-studio-code.html</link>
+        <pubDate>2015-04-29T05:00:00-04:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p><img src="/images/vscode.png" alt="Visual Studio Code" title="Visual Studio Code"></p>
+
+<p>What an announcement Microsoft did at the Build conference this morning. There has been lots of shocking announcements
+to be honest.</p>
+
+<h3>Visual Studio Code for Mac OSX and Linux</h3>
+
+<p>I was really intrigued to try this one out, a lightweight code editor with multiple languages supported and the
+Visual Studio intellisense. I’ve installed it on my Arch Linux.</p>
+
+<p>Just <a href="https://code.visualstudio.com/Download">download</a> and unzip the file, it’s an executing binary just started
+it <code>./Code</code> and here it was.</p>
+
+<h3>Small footprint but interesting features</h3>
+
+<p>I’ve tried it very quickly for JavaScript and C# intellisense. Seems to be pretty good. And has they’ve said
+it’s not only auto-completion but really intellisense.</p>
+
+<p>This is not a review in any case, but I just needed to try it out for myself.</p>
+
+<p>Normally I use a combinasion of Atom, WebStorm, Vim, PyCharm and Visual Studio. This VSCode is worth investigating
+where it can fit.</p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2015/04/visual-studio-code</wp:post_id>
+        <wp:post_date>2015-04-29T05:00:00-04:00</wp:post_date>
+        <wp:post_date_gmt>2015-04-29T05:00:00-04:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename="visual-studio"><![CDATA[["visual-studio"]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+      <item>
+        <title><![CDATA[The day I ditched Windows 8 for Linux]]></title>
+        <link>http://dominicstpierre.com/2014/06/the-day-i-ditched-windows-for-linux.html</link>
+        <pubDate>2014-06-11T07:25:45-04:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p><img src="/images/linux-desktop.png" alt="simple C color inverter" title="simple C color inverter"></p>
+
+<p>My main source of revenue is by getting paid to architect and develop C# software
+for companies running in Windows infrastructure. Still, since I installed Windows 8
+when it launched, I&#39;ve been slowed down by my OS. I&#39;m not writing this to start any
+kind of OS war whatsoever. Its just that I decided to try something else.</p>
+
+<p>Now, I&#39;ve not <em>totally abandoned</em> Windows. It is required in my consulting job. But
+if you are like me and appreciate learning new programming languages and trying
+all kind of technologies, you might want to try this as well. As I&#39;ve tweeted a
+couple of days ago:</p>
+
+<blockquote>
+<blockquote>
+<p>How many billable hours #Windows8 makes you lost before you decided to switch to another
+OS? I&#39;m yet again in a nothing&#39;s working situation.</p>
+</blockquote>
+</blockquote>
+
+<p>It is not something that you do without preparation though. Here is how I did it.</p>
+
+<h3>I tried to switch before</h3>
+
+<p>Those thoughts started in 2008 when I decided to try Mac. I bought an iMac and ran
+on Mac OS X for about 1.5 year. I guess Vista annoyed me at that time. But Mac
+was not for me, too visual.</p>
+
+<p>In 1998 I ran only on a console based Debian Linux, at the time I was almost just
+using BitchX (irc client) and text-based web browsers. I tried many times
+to return to Linux since then. But two days ago, June 9th 2014, I was
+ready to do whatever I had to do to have a Linux OS that should allow me
+to continue supporting my clients and get my work done. But more importantly
+to get an OS that shall let me be in control again, productive and stable.</p>
+
+<h3>What went wrong with Windows 8 for me</h3>
+
+<ol>
+<li><strong>Stability</strong>: I never had that many hard drive issues until Windows 8. The store
+apps was all corrupted two times. Countless times the OS scanned and tried to repair
+disk errors before opening Windows.</li>
+<li><strong>Responsiveness</strong>: Too often I opened Visual Studio, Chrome, Firefox and all of a sudden
+clicking on an icon to make the app appearing just did nothing. All the desktop was
+frozen, ALT+TAB, ALT+F4 nothing was responding, but the current app continued to work.</li>
+</ol>
+
+<h3>What was keeping me from ditching Windows</h3>
+
+<ol>
+<li><strong>Camtasia Studio</strong>: I bought Camtasia Studio a couple of months ago. I was sad to have paid $300 and used
+it for about 15-20 screen casts. But still, the issue with Windows 8 greatly out-weight the benefits
+of a single software.</li>
+<li><strong>My Steam Games</strong>: I have lots of game that I bought on Steam when Steam did their weekend deals. One
+of my favourite game is Civilization, I have a lots of turn-based games. I&#39;ll have to keep them on an older
+PC, that&#39;s not terrible.</li>
+<li><strong>Visual Studio</strong>: As I&#39;ve said, I&#39;m primarily a C# developer, Visual Studio is a big part of my revenue stream.
+I don&#39;t really have alternative on Linux like Camtasia has, but I may manage to use it via a virtual machine.</li>
+</ol>
+
+<h3>How to continue using Visual Studio in Linux</h3>
+
+<p>I have no problem running Visual Studio in a virtual machine using VirtualBox. I picked a Windows 7
+OS to run Visual Studio 2013. I&#39;m planning on installing nothing more in that virtual machine. I will
+try to keep everything else on Linux. I&#39;m willing to take my time and find alternative ways to do
+things that I&#39;m used to do in Windows.</p>
+
+<p>This is the hard part. When you do something that you know it should take you X minutes in Windows. Now you
+have to dig a bit and maybe learn new ways of accomplishing the task. But I enjoy learning new things, I
+don&#39;t think that would be much of a pain for me.</p>
+
+<h3>What distribution I choose</h3>
+
+<p>Here&#39;s how it went:</p>
+
+<h4>June 9th 2014</h4>
+
+<p><strong>8:00 pm</strong>: The family routine is over, kids are OK, time to attack the installation of ArchLinux.
+I was running Arch in a VM on Windows and I liked the lightweight aspect and being in control.</p>
+
+<p><strong>10:XX pm</strong>: My 1-month-old PC gives me hard time installing Arch, I downloaded Manjaro
+and tried to see if their installer was doing a better job than me.</p>
+
+<p><strong>10:50 pm</strong>: Looks like I will not be able to work tomorrow. Linux is still not installed. Manjaro also
+failed installing. WTF is that new PC.</p>
+
+<p><strong>11:XX pm</strong>: Let&#39;s try my good old friend Debian.</p>
+
+<p><strong>11:3X pm</strong>: My network card is not supported. Haaaaa, that UEFI bios, WTH is that. Alright, just
+for curiosity, would Ubuntu work.</p>
+
+<p><strong>11:5X pm</strong>: Yeah :(. Well... It was certainly not my first choice. But Ubuntu installed without
+any glitch. I need to install VirtualBox, Skype, Windows 7, Visual Studio transfer my backup source
+code to be ready for work in about 7 hours.</p>
+
+<p><strong>12:XX am</strong>: Alright, I&#39;m too old for this, I will take the A.M. tomorrow and finish this up.</p>
+
+<h4>June 10th 2014</h4>
+
+<p><strong>5:5X am</strong>: Fresh and clean, I&#39;m now top shape, let&#39;s do this... Installing VS 2013 and get my source code in place.</p>
+
+<p><strong>6:3X am</strong>: Alright, everything seems to be in place, I don&#39;t really like how VirtualBox display my
+Windows 7 VM, but for now it works.</p>
+
+<p><strong>7:XX am</strong>: Then, I decided to try if I could installed Xfce instead of Unity. You know
+that kind of thoughts couple of minutes before starting to work.</p>
+
+<p>What a crap. I don&#39;t really remember what I did, but I added couple of packages, did not liked the results
+than I removed couple of packages, and boom! The thing was all crappy suddenly. Holly sh*t. Why did
+I try something like this, I was in a working state, but no...</p>
+
+<p><strong>9:XX am</strong>: Fine, I will quickly install Windows 7, that should do the trick, I will not
+use Windows 8 and I will be up and ready to work without loosing too much of billable hours.</p>
+
+<p><strong>9:XX am</strong>: What, my network card is not detected by Windows 7. I don&#39;t have time to search for all those
+drivers...</p>
+
+<p>OK, I took a long deep breath and I said:</p>
+
+<blockquote>
+<blockquote>
+<p>You wanted to go with Arch, you should try it until it work.</p>
+</blockquote>
+</blockquote>
+
+<p><strong>10:XX am</strong>: Let&#39;s give Arch another chance.</p>
+
+<p><strong>11:XX am</strong>: Nope, I failed. Well, OK let&#39;s return to Ubuntu and try not to do stupid thing this time.</p>
+
+<p>Yep, that&#39;s me. Went to Linux, than Windows 7 than back to Linux in 12 hours. But I did not wanted
+to dual-boot. If you dual-boot it&#39;s too easy to be tempted to always return to the easy path and
+it take a longer time to learn.</p>
+
+<p>The moral of the story is, if you are thinking about switching to Linux, make sure you have the following.</p>
+
+<ol>
+<li><strong>Patience</strong>: You&#39;ll need a lot a patience.</li>
+<li><strong>Read a lot</strong>: Don&#39;t expect everything to just work as is immediately. You&#39;ll need to dig.</li>
+<li><strong>Accept that it&#39;s not perfect</strong>: This is a major change, and as with anything we are afraid of changing
+something. Accept that it&#39;s going to be bumpy and not really the way you&#39;ve planned or imagined.</li>
+<li><strong>Research before acting</strong>: Make sure you search before doing anything. Check which Linux packages you&#39;ll need
+to replace software you use in Windows.</li>
+</ol>
+
+<p>When you are in an hurry, it&#39;s often not the best time to install a Linux distribution that does not
+work out of the box with your current hardware.</p>
+
+<h3>I&#39;m now in control</h3>
+
+<p>I&#39;ve already my feet wet. I was unable to get a tool <em>xcalib</em> to invert colour of both of my screen.
+Only one of them was inverted. I took some code here and there and compiled a small C utility that
+invert my screens. For a programmer Linux feels right at home. As anything it take times to really
+be comfortable with a new environment. My first task on my list is to learn Kdenlive and continue
+my screen casts the way I was using Camtasia Studio.</p>
+
+<p>If you are a .NET dev, you should at least consider creating a Linux virtual machine on your Windows box.
+Developing Python, NodeJS, Go is much appealing on that OS to say the least.</p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2014/06/the-day-i-ditched-windows-for-linux</wp:post_id>
+        <wp:post_date>2014-06-11T07:25:45-04:00</wp:post_date>
+        <wp:post_date_gmt>2014-06-11T07:25:45-04:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename="linux"><![CDATA[["linux",]]></category>
+
+          <category domain="post_tag" nicename="windows"><![CDATA["windows"]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+
+      <item>
+        <title><![CDATA[50k unique visitors in 3 days with a 3 years old article]]></title>
+        <link>http://dominicstpierre.com/2013/12/50k-unique-visitor-in-3-days-with-3.html</link>
+        <pubDate>2013-12-19T17:10:36-05:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p><img src="/images/traffic-spike.png" alt="traffic-spike" title="Traffic Spike"></p>
+
+<p>Social media can be really powerful. I mean, I never been able to generate
+more than ~1,000 visitors in one day for any of my products. No matter what
+kind of methods I tried. My wife and I started a content site for parents in
+2009-2010. We wanted to try something together. We thought that by joining
+both our strength we would have better chance of succeeding.</p>
+
+<p>On December 16th my wife told me that one of the article that were written in
+Nov 2010 got some likes on Facebook, she mentioned a number in the range of
+600-700 people. Our website target the alternative parents and is in French so
+the audience is not as wide as if it were for mainstream people in English.</p>
+
+<p>I than looked at the Google Analytics data and bam! 10,804 visits. I was
+simply stoked. I mean 10k people saw that article and the website in one day.
+And this is a 3 years old article. What happened, why now? I immediately told
+my wife:</p>
+
+<blockquote>
+<p>What’s going on? How could that be happening?</p>
+</blockquote>
+
+<p>The article finished the day with ~7,000 likes. The article is related to
+respecting the children during Christmas time. It turns out that it was picked
+by influencers this year and it just bubble up.</p>
+
+<p>On December 17th mind you, the first thing I did was to open GA and see and
+bam! 27,591 people that day. This is not possible right? Almost 30k in one
+day, this is insane. At that point I was so excited and intrigued about why
+that was happening 3 years after.</p>
+
+<h2>Giving value at the right time</h2>
+
+<p>Maybe the writers that were writing in 2010 were a bit ahead of there time.
+Those articles are touching subjects that some parents could be uncomfortable
+with. I’m not going to enter in any details here, that’s not my point. But my
+point is that, 50,217 people viewed the website and connect with the brand
+simply because of Facebook. The timing was good I would say and the topic is
+probably more relevant now than 3 years ago, who knows.</p>
+
+<p>though that traffic would probably not have converted into paying customers.
+We don’t know since we do not sell anything, but still, 50k people talking
+about you in a short amount of time is a great accomplishment for a small
+market. I’ve heard lots of solopreneur saying that social media was a complete
+waste of time, but if your content do have real value and resonate in
+influencer’s mind, that could be a really nice boost of traffic and most
+importantly brand awareness.</p>
+
+<p>At this time the article do have ~14,000 Facebook likes and the author did a
+part 2 article to keep the pace. Sometimes luck do play a role in ones
+success.</p>
+
+<h2>Is it replicable in a B2B product scenario</h2>
+
+<p>I’m not sure, since I’ve never been able to generate that kind of traffic for
+a product. It has been said and repeat for a long time now, but having quality
+informative content on your site will help you gain authority in the long run.</p>
+
+<p>We are always too quick to ditch content marketing, well I am, I don’t know
+about you. But if after 3-4 month I don’t see changes I kind of stop or put
+the content generation on hold etc. If I create a 5th product (ho yeah, I’m
+already at 5), I will make sure to get at least 3 epic, quality blog post that
+are of highest value possible for my target audience. And I’m not talking
+about the next feature or changes that has been added to the product.</p>
+
+<p>You target audience normally do not care that much about your last push. It is
+time consuming, it take skills but it can be done with some efforts. And
+improving this skills will be beneficial for the future.</p>
+
+<p>I would certainly love to have 50k unique visitors in 3 days for my next
+product.</p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2013/12/50k-unique-visitor-in-3-days-with-3</wp:post_id>
+        <wp:post_date>2013-12-19T17:10:36-05:00</wp:post_date>
+        <wp:post_date_gmt>2013-12-19T17:10:36-05:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename="micropreneur"><![CDATA[["micropreneur"]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+      <item>
+        <title><![CDATA[My own RSS reader in 1 hour and 172 line of JavaScript]]></title>
+        <link>http://dominicstpierre.com/2013/12/my-own-rss-reader-1-hour-and-172.html</link>
+        <pubDate>2013-12-04T12:42:20-05:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p><strong>Major update: I’ve removed jQuery and now I’m at 101 lines of vanilla Javascript.</strong></p>
+
+<blockquote>
+<p>I’ve posted this on Reddit Javascript and Wince made me realize that by having
+jQuery as dependency, the 172 lines of code was not a fact, since jQuery have
+10k LoC.</p>
+
+<p>So I’ve took the challenge and rewrite the RSS reader by removing the jQuery
+reference and rewriting lots of the DOM, events code that I had for jQuery.
+And I’m now at 101 lines of JavaScript code, a save of 42 %, it’s crazy.</p>
+
+<p>I’m leaving the article as it were at first, and I’m posting the entire
+JavaScript code in the bottom. The code at GitHub is updated as well.</p>
+</blockquote>
+
+<p>Like many others, I find myself “RSS reader-less” when Google decided to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-%0Areader.html">shut
+down Reader</a>. Yes, I’ve tried a couple of alternatives, but nothing was really
+appealing to me. When I woke up this morning I had a thought, would that be
+that long to write a one page HTML / JavaScript RSS reader?</p>
+
+<p>It turns out to be pretty quick and easy, thanks to the <a href="https://developers.google.com/feed/">Google Feed
+API</a> which allow you to get a nice JSON
+object from an RSS feed.</p>
+
+<p><img src="/images/connectica.png" alt="connectica" title="Connectica screenshot"></p>
+
+<h2>No non-sense amount of files</h2>
+
+<p>This is the first project I’m starting since the sale of my last SaaS. I
+wanted something quick. I was using <a href="https://www.goread.io/">goread.io</a>
+recently as my Google Reader replacement and I thought, what do I really need
+when reading my news?</p>
+
+<ol>
+<li>I need to see the last post for blog I follow</li>
+<li>I need to be able to read the post and keep track of which I’ve read</li>
+<li>I need to be able to add and remove blog feed</li>
+</ol>
+
+<p>I felt like I was missing posts from my favorite “crew” recently and since I
+like to be on the edge as much as possible I had to do something to make sure
+I got those articles in front of me.</p>
+
+<p>Let’s open Visual Studio and start a new HTML page where everything will be
+there to consume RSS feeds.</p>
+
+<h2>The magic piece of code</h2>
+
+<p><em>this is the original code using jQuery</em></p>
+
+<p>Here’s the most important JavaScript function:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">function</span> <span class="nx">parseRSS</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+          <span class="na">url</span><span class="p">:</span> <span class="s1">'https://ajax.googleapis.com/ajax/services/feed/load?v=1.0&amp;num=10&amp;callback=?&amp;q='</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">url</span><span class="p">),</span>
+          <span class="na">dataType</span><span class="p">:</span> <span class="s1">'json'</span><span class="p">,</span>
+        <span class="na">success</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">callback</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">responseData</span><span class="p">.</span><span class="nx">feed</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Easy enough. This API convert an RSS feed to JSON.</p>
+
+<h3>Using localStorage and sessionStorage</h3>
+
+<p>I’m using a simple JSON object { name, url } to hold all feeds that have been
+added in the localStorage.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">function</span> <span class="nx">loadFeeds</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s1">'#feed-list'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="s1">''</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">feeds</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'feeds'</span><span class="p">));</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">feeds</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feeds</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="nx">feeds</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">addFeed</span><span class="p">();</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">feeds</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">$</span><span class="p">(</span><span class="s1">'#feed-list'</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span>
+            <span class="s1">'&lt;span class="feed" data-url="'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">url</span> <span class="o">+</span> <span class="s1">'"&gt;'</span> <span class="o">+</span>
+            <span class="s1">'  &lt;a href="#" class="switch-feed"&gt;'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'&lt;/a&gt;'</span> <span class="o">+</span>
+            <span class="s1">'  &lt;a href="#" class="delete-feed"&gt;X&lt;/a&gt;'</span> <span class="o">+</span>
+            <span class="s1">'&lt;/span&gt;'</span><span class="p">);</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div>
+<blockquote>
+<p>I know, why are you not using any template mechanism. This thing took me in
+all 1.5 hours to write, add to GitHub and deploy to Azure.</p>
+</blockquote>
+
+<p>I’m simply iterating on all saved feed and displaying a link to load the
+latest posts. When we click on a feed the idea is to check if the posts were
+already loaded into the sessionStorage and display it.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">$</span><span class="p">(</span><span class="s1">'body'</span><span class="p">).</span><span class="nx">on</span><span class="p">({</span>
+      <span class="na">click</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+        <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">data</span><span class="p">(</span><span class="s1">'url'</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">feed</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feed</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">parseRSS</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>
+          <span class="nx">showFeed</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+        <span class="p">});</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'cached'</span><span class="p">);</span>
+          <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">feed</span><span class="p">);</span>
+          <span class="nx">showFeed</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="s1">'.switch-feed'</span><span class="p">);</span>
+</code></pre></div>
+<p>This will keep all feed data during all the time of the session and will be
+deleted once the browser is closed.</p>
+
+<p>I’m also using localStorage to track which post were opened by using an Array
+of URL. Here the two functions that take care of tagging and telling which
+post has been read.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">function</span> <span class="nx">hasRead</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">read</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'read'</span><span class="p">));</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">read</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">read</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="kd">var</span> <span class="nx">found</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+      <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">read</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">read</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">found</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+          <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="k">return</span> <span class="nx">found</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">flagAsRead</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">read</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'read'</span><span class="p">));</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">read</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">read</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">read</span> <span class="o">=</span> <span class="p">[];</span>
+      <span class="p">}</span>
+      <span class="nx">read</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+      <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'read'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">read</span><span class="p">));</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>The only thing missing for my needs was to display the blog post in question
+when we click on the title. This also flag the post as read and get the post
+from the cached version in sessionStorage.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">$</span><span class="p">(</span><span class="s1">'body'</span><span class="p">).</span><span class="nx">on</span><span class="p">({</span>
+      <span class="na">click</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">'.content'</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>
+        <span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">parent</span><span class="p">();</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">parent</span><span class="p">.</span><span class="nx">hasClass</span><span class="p">(</span><span class="s1">'active'</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">'.snippet'</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">'.content'</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">'active'</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">'.snippet'</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">'.content'</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">'active'</span><span class="p">);</span>
+          <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="s1">'url'</span><span class="p">);</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">hasClass</span><span class="p">(</span><span class="s1">'new-post'</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nx">flagAsRead</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+            <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">'new-post'</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">'old-post'</span><span class="p">);</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="s1">'.show-post'</span><span class="p">);</span>
+
+    <span class="kd">function</span> <span class="nx">showFeed</span><span class="p">(</span><span class="nx">feed</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s1">'#blogs'</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s1">''</span><span class="p">);</span>
+      <span class="nx">feed</span><span class="p">.</span><span class="nx">entries</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">publishedDate</span><span class="p">);</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s1">'#blogs'</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span>
+        <span class="s1">'&lt;div class="blog"&gt;'</span> <span class="o">+</span>
+        <span class="s1">'  &lt;div class="show-post '</span> <span class="o">+</span> <span class="p">(</span><span class="nx">hasRead</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">link</span><span class="p">)</span> <span class="p">?</span> <span class="s1">'old-post'</span> <span class="p">:</span> <span class="s1">'new-post'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'" data-url="'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">link</span> <span class="o">+</span> <span class="s1">'"&gt;'</span> <span class="o">+</span>
+          <span class="nx">d</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span> <span class="o">+</span> <span class="s1">' - '</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">title</span> <span class="o">+</span>
+        <span class="s1">'&lt;/div&gt;'</span> <span class="o">+</span>
+        <span class="s1">'&lt;p class="snippet"&gt;'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">contentSnippet</span> <span class="o">+</span> <span class="s1">'&lt;/p&gt;'</span> <span class="o">+</span>
+        <span class="s1">'&lt;div class="content"&gt;'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">content</span> <span class="o">+</span> <span class="s1">'&lt;/div&gt;'</span> <span class="o">+</span>
+        <span class="s1">'&lt;/div&gt;'</span><span class="p">);</span>
+      <span class="p">});</span>
+
+      <span class="nx">$</span><span class="p">(</span><span class="s1">'.content'</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>The showPost function is called when we click on a blog name link. This load
+all the available posts and hide the content and only display a snippet of the
+post. When we click on the post title the snippet is hidden and the content is
+shown. It’s not pretty how the HTML is render and most of the code is probably
+not optimal. The points was not to create a nice code but to get a working RSS
+reader in one file with only HTML, CSS and JavaScript.</p>
+
+<h2>Connectica is born</h2>
+
+<p>I named this project connectica and it’s available on
+<a href="https://github.com/dstpierre/connectica">GitHub</a> and it’s also live at
+<a href="http://connecti.ca">http://connecti.ca</a>.</p>
+
+<p><strong>This is the code without jQuery.</strong></p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">google</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s2">"feeds"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">addNewFeed</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+    <span class="c1">// helpers from Todd Motto: http://toddmotto.com/creating-jquery-style-functions-in-javascript-hasclass-addclass-removeclass-toggleclass/  </span>
+    <span class="kd">var</span> <span class="nx">hasClass</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">' '</span> <span class="o">+</span> <span class="nx">className</span> <span class="o">+</span> <span class="s1">' '</span><span class="p">).</span><span class="nx">test</span><span class="p">(</span><span class="s1">' '</span> <span class="o">+</span> <span class="nx">elem</span><span class="p">.</span><span class="nx">className</span> <span class="o">+</span> <span class="s1">' '</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">addClass</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasClass</span><span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nx">elem</span><span class="p">.</span><span class="nx">className</span> <span class="o">+=</span> <span class="s1">' '</span> <span class="o">+</span> <span class="nx">className</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">removeClass</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">newClass</span> <span class="o">=</span> <span class="s1">' '</span> <span class="o">+</span> <span class="nx">elem</span><span class="p">.</span><span class="nx">className</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[\t\r\n]</span><span class="sr">/g</span><span class="p">,</span> <span class="s1">' '</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' '</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">hasClass</span><span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nx">newClass</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">' '</span> <span class="o">+</span> <span class="nx">className</span> <span class="o">+</span> <span class="s1">' '</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">newClass</span> <span class="o">=</span> <span class="nx">newClass</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">' '</span> <span class="o">+</span> <span class="nx">className</span> <span class="o">+</span> <span class="s1">' '</span><span class="p">,</span> <span class="s1">' '</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="nx">elem</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="nx">newClass</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^</span><span class="se">\s</span><span class="sr">+|</span><span class="se">\s</span><span class="sr">+$/g</span><span class="p">,</span> <span class="s1">''</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1">// my own helper function  </span>
+    <span class="kd">function</span> <span class="nx">isModern</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">'querySelector'</span> <span class="k">in</span> <span class="nb">document</span> <span class="o">&amp;&amp;</span> <span class="s1">'addEventListener'</span> <span class="k">in</span> <span class="nb">window</span> <span class="o">&amp;&amp;</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">forEach</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="k">else</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">setVisibility</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">elm</span><span class="p">,</span> <span class="nx">visible</span><span class="p">)</span>  <span class="p">{</span>
+        <span class="nx">elm</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="nx">visible</span> <span class="p">?</span> <span class="s1">'block'</span> <span class="p">:</span> <span class="s1">'none'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">changeInputColor</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">color</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">allInputs</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'input[type="text"]'</span><span class="p">);</span>
+        <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">allInputs</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">i</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">backgroundcolor</span> <span class="o">=</span> <span class="nx">color</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">resetInputText</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">allInputs</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'input[type="text"]'</span><span class="p">);</span>
+        <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">allInputs</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">i</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isModern</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">alert</span><span class="p">(</span><span class="s1">'Your browser cannot run this app.'</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nx">addNewFeed</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#add-new-feed'</span><span class="p">);</span>
+
+        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">addNewFeed</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">newFeed</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#new-feed'</span><span class="p">);</span>
+        <span class="nx">newFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+            <span class="nx">addFeed</span><span class="p">();</span>
+        <span class="p">});</span>
+        <span class="kd">var</span> <span class="nx">addFeed</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#add-feed'</span><span class="p">);</span>
+        <span class="nx">addFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+            <span class="nx">changeInputColor</span><span class="p">(</span><span class="s1">'white'</span><span class="p">);</span>
+            <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'input[name="feed-name"]'</span><span class="p">).</span><span class="nx">value</span><span class="p">;</span>
+            <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'input[name=feed-url'</span><span class="p">).</span><span class="nx">value</span><span class="p">;</span>
+            <span class="k">if</span><span class="p">((</span><span class="nx">name</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">name</span> <span class="o">==</span> <span class="s1">''</span><span class="p">)</span> <span class="o">||</span>
+                <span class="p">(</span><span class="nx">url</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">url</span> <span class="o">==</span> <span class="s1">''</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nx">changeInputColor</span><span class="p">(</span><span class="s1">'yellow'</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="kd">var</span> <span class="nx">feeds</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'feeds'</span><span class="p">));</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">feeds</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feeds</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">feeds</span> <span class="o">=</span> <span class="p">[];</span>
+            <span class="p">}</span>
+            <span class="nx">feeds</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span> <span class="na">name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span> <span class="na">url</span><span class="p">:</span> <span class="nx">url</span> <span class="p">});</span>
+            <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'feeds'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">feeds</span><span class="p">));</span>
+            <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">addNewFeed</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+            <span class="nx">resetInputText</span><span class="p">();</span>
+            <span class="nx">loadFeeds</span><span class="p">();</span>
+        <span class="p">});</span>
+        <span class="nx">loadFeeds</span><span class="p">();</span>
+    <span class="p">};</span>
+    <span class="kd">function</span> <span class="nx">addFeed</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">addNewFeed</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+        <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'input[name=feed-name'</span><span class="p">).</span><span class="nx">focus</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">loadFeeds</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#feed-list'</span><span class="p">);</span>
+        <span class="nx">list</span><span class="p">.</span><span class="nx">innerText</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">feeds</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'feeds'</span><span class="p">));</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">feeds</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feeds</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="nx">feeds</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">addFeed</span><span class="p">();</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">toRemove</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.switch-feed'</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">toRemove</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">toRemove</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">toRemove</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">toRemove</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">l</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">);</span>
+                <span class="p">});</span>
+            <span class="p">}</span>
+            <span class="nx">toRemove</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.delete-feed'</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">toRemove</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">toRemove</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">toRemove</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">toRemove</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">l</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">);</span>
+                <span class="p">});</span>
+            <span class="p">}</span>
+            <span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+            <span class="nx">feeds</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">buffer</span> <span class="o">+=</span>
+                    <span class="s1">'&lt;span class="feed" data-url="'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">url</span> <span class="o">+</span> <span class="s1">'"&gt;'</span> <span class="o">+</span>
+                    <span class="s1">'  &lt;a href="#" class="switch-feed"&gt;'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'&lt;/a&gt;'</span> <span class="o">+</span>
+                    <span class="s1">'  &lt;a href="#" class="delete-feed"&gt;X&lt;/a&gt;'</span> <span class="o">+</span>
+                    <span class="s1">'&lt;/span&gt;'</span><span class="p">;</span>
+            <span class="p">});</span>
+            <span class="nx">list</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">;</span>
+            <span class="kd">var</span> <span class="nx">items</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.switch-feed'</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">items</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">items</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">items</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">l</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+                        <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">'data-url'</span><span class="p">);</span>
+                        <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="nx">feed</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feed</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+                            <span class="nx">parseRSS</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+                                <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">feed</span><span class="p">));</span>
+                                <span class="nx">showFeed</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">feed</span><span class="p">);</span>
+                            <span class="p">});</span>
+                        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'cached'</span><span class="p">);</span>
+                            <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">feed</span><span class="p">);</span>
+                            <span class="nx">showFeed</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+                        <span class="p">}</span>
+                <span class="p">});</span>
+            <span class="p">}</span>
+            <span class="nx">items</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.delete-feed'</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">items</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">items</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">items</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">l</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+                        <span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">;</span>
+                        <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">'data-url'</span><span class="p">);</span>
+                        <span class="nx">parent</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="nx">parent</span><span class="p">);</span>
+                        <span class="kd">var</span> <span class="nx">feeds</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'feeds'</span><span class="p">));</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="nx">feeds</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">feeds</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+                            <span class="kd">var</span> <span class="nx">newFeeds</span> <span class="o">=</span> <span class="p">[];</span>
+                            <span class="nx">feeds</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+                                <span class="k">if</span> <span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">url</span> <span class="o">!=</span> <span class="nx">url</span><span class="p">)</span>
+                                    <span class="nx">newFeeds</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">f</span><span class="p">);</span>
+                            <span class="p">});</span>
+                            <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'feeds'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">newFeeds</span><span class="p">));</span>
+                        <span class="p">}</span>
+
+                    <span class="p">});</span>
+                <span class="p">});</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">showFeed</span><span class="p">(</span><span class="nx">feed</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">blogs</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#blogs'</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">posts</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.show-post'</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">posts</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">posts</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">posts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">posts</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">p</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">);</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+        <span class="nx">blogs</span><span class="p">.</span><span class="nx">innerText</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
+        <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">feed</span><span class="p">.</span><span class="nx">entries</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">publishedDate</span><span class="p">);</span>
+            <span class="nx">buffer</span> <span class="o">+=</span>
+                <span class="s1">'&lt;div class="blog"&gt;'</span> <span class="o">+</span>
+                <span class="s1">'  &lt;div class="show-post '</span> <span class="o">+</span> <span class="p">(</span><span class="nx">hasRead</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">link</span><span class="p">)</span> <span class="p">?</span> <span class="s1">'old-post'</span> <span class="p">:</span> <span class="s1">'new-post'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'" data-url="'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">link</span> <span class="o">+</span> <span class="s1">'"&gt;'</span> <span class="o">+</span>
+                    <span class="nx">d</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span> <span class="o">+</span> <span class="s1">' - '</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">title</span> <span class="o">+</span>
+                <span class="s1">'&lt;/div&gt;'</span> <span class="o">+</span>
+                <span class="s1">'&lt;p class="snippet"&gt;'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">contentSnippet</span> <span class="o">+</span> <span class="s1">'&lt;/p&gt;'</span> <span class="o">+</span>
+                <span class="s1">'&lt;div class="content" style="display: none;"&gt;'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">content</span> <span class="o">+</span> <span class="s1">'&lt;/div&gt;'</span> <span class="o">+</span>
+                <span class="s1">'&lt;/div&gt;'</span><span class="p">;</span>
+        <span class="p">});</span>
+        <span class="nx">blogs</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">;</span>
+        <span class="nx">posts</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.show-post'</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">posts</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">posts</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">posts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">posts</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">p</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+                    <span class="kd">var</span> <span class="nx">contents</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.content'</span><span class="p">);</span>
+                    <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">contents</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+                    <span class="p">});</span>
+                    <span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">;</span>
+                    <span class="kd">var</span> <span class="nx">snippet</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.snippet'</span><span class="p">);</span>
+                    <span class="kd">var</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'.content'</span><span class="p">);</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">hasClass</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="s1">'active'</span><span class="p">))</span> <span class="p">{</span>
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">snippet</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">content</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+                        <span class="nx">removeClass</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="s1">'active'</span><span class="p">);</span>
+                    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">snippet</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">content</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+                        <span class="nx">addClass</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="s1">'active'</span><span class="p">);</span>
+                        <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">'data-url'</span><span class="p">);</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="nx">hasClass</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'new-post'</span><span class="p">))</span> <span class="p">{</span>
+                            <span class="nx">flagAsRead</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+                            <span class="nx">removeClass</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'new-post'</span><span class="p">);</span>
+                            <span class="nx">addClass</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">'old-post'</span><span class="p">);</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">});</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">flagAsRead</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">read</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'read'</span><span class="p">));</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">read</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">read</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">read</span> <span class="o">=</span> <span class="p">[];</span>
+        <span class="p">}</span>
+        <span class="nx">read</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+        <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'read'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">read</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">hasRead</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">read</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'read'</span><span class="p">));</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">read</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">read</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kd">var</span> <span class="nx">found</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">read</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">read</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">found</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">found</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">parseRSS</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">google</span><span class="p">.</span><span class="nx">feeds</span><span class="p">.</span><span class="nx">Feed</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+        <span class="nx">feed</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">debugObject</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">keys</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">keys</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div>
+<h2>The querySelector and querySelectorAll</h2>
+
+<p>I’ve almost switch 1-for-1 the jQuery selector with the document.querySelector
+and document.querySelectorAll. I find this extremely confortable after a
+couple of minutes. I might not use this the proper way, but at first I tried
+to to forEach directly on what the function querySelectorAll return. But I was
+getting “Object does not support forEach”. So I ended up doing that trick, but
+I would prefer another way, clearly I’m doing something wrong here.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'.class-name'</span><span class="p">);</span>
+    <span class="c1">// this work  </span>
+    <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">item</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">'this work'</span><span class="p">;</span>
+    <span class="p">});</span>
+    <span class="c1">//this does not work  </span>
+    <span class="nx">list</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">item</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">'this work'</span><span class="p">;</span>
+    <span class="p">});</span>
+</code></pre></div>
+<p><em>If someone can explain why the second block is not working, that would be
+appreciated.</em></p>
+
+<h2>Event listeners</h2>
+
+<p>Adding and removing event on element is as simple as that:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="kd">var</span> <span class="nx">button</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#add-feed'</span><span class="p">);</span>
+    <span class="nx">button</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="p">});</span>
+    <span class="c1">// removing the event  </span>
+    <span class="nx">button</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">'click'</span><span class="p">);</span>
+</code></pre></div>
+<p>The rest of the adventure removing jQuery was just small thing (for this
+simple app that is). Like getting the parent of an element with .parentNode.
+Checking, adding and removing CSS class, I took helper function from <a href="http://toddmotto.com/creating-jquery-style-functions-in-javascript-%0Ahasclass-addclass-removeclass-toggleclass/">Todd
+Motto</a>.</p>
+
+<p>At the end the first iteration was fun, but removing jQuery as a challenge was
+more challenging and entertaining. And this is exactly what I’m after now.</p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2013/12/my-own-rss-reader-1-hour-and-172</wp:post_id>
+        <wp:post_date>2013-12-04T12:42:20-05:00</wp:post_date>
+        <wp:post_date_gmt>2013-12-04T12:42:20-05:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename="javascript"><![CDATA[["javascript"]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+      <item>
+        <title><![CDATA[Congratulation you’ve failed again (SaaS)]]></title>
+        <link>http://dominicstpierre.com/2013/11/congratulation-youve-failed-again-saas.html</link>
+        <pubDate>2013-11-28T08:43:21-05:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p>If I hadn’t lost all my 2007-2011 blog posts the “again” in the title would
+probably be more easy to confirm. Here’s what I’ve done in the last years in
+terms of SaaS.</p>
+
+<p><img src="/images/congrats-you-failed-again.png" alt="congrats-you-failed-again" title="My SaaS results since 2008"></p>
+
+<p>Looking at this table it’s almost easy to say: “Well, maybe if you had
+continued one product more than 1.5 year you would have been more successful”.</p>
+
+<p>Maybe, but it’s excruciably hard to pursue a venture when there’s not much
+revenue and low number of customers thrilled to use your software. I have no
+regrets though, I’ve learned a lot and took paths that I will never revisit
+again. I’m not that <strong>attracted to SaaS anymore</strong>, maybe I’m not fit to have
+that kind of software business, maybe the niches and markets were too crowded.
+No matter what, I’m now returning to what I always loved and were excited to
+do – more on that later.</p>
+
+<h2>What worked</h2>
+
+<p>This is some marketing tasks I’ve done that worked for me and if you did not
+tried them you might want to give them a shot.</p>
+
+<p>*<em>30 minutes 1-on-1 consulting for new customers. *</em>It’s part of having a great onboarding experiences for your new customers. Having an easy to follow product tour or some training are good and you should put efforts to polish those. But offering a 1-on-1 30 minutes Skype call to your new customers *<em>WILL *</em>most certainly boost your conversion rates instantly.</p>
+
+<p>From August 2013 to October 2013 I’ve been able to double the revenue of my
+SaaS using that technique. It’s ultra time consuming I’ll give you that, but
+the information you get showing your app to a new customers is gold. Getting
+their feedback live and seeing where they are blocking and unsure about what
+to do next or how to do things is the key to enhance your UX. Try this out and
+let me know the results.</p>
+
+<p>*<em>Third party integration. *</em>I’m a huge fan of the Open Web. With Bunker App and Osmosis I created an API and put efforts to connect the app with other software that would bring more values to my customers if they were to use the other apps. Exchanging data is a great way to save time for your customers. Doing the hard work for them can be a valid selling point.</p>
+
+<p>With Osmosis I went one step further and I’ve integrated the app with almost
+any third-party software that existing customers were requesting. I’ve
+contacted those software companies to let them know about the integration and
+they sometimes add your app on their add-ons or externals apps page. The
+traffic coming from those links is really good since those visitors are
+already using the other app and should see the benefits of connecting your app
+with their current account.</p>
+
+<p>You can also connect to <a href="https://zapier.com">Zapier</a> and get instant access to
+nearly 200 other apps that are ready to exchange data with your app. I really
+enjoyed doing the Zapier integration and literally fall in love with the way
+they handle all the connection between apps and all the interactions.</p>
+
+<p>*<em>Guest post, but high value legit content. *</em>I’m not even sure it can be called a guest post. Writing high value content on a popular blog that fit your targeted audience but without necessarily trying to sell your product on the article. Plan on writing at least 3-4 posts on the same blog to get the best result possible. Have a signature that point to your product’s website. </p>
+
+<p>There’s no magic here, people are tired of always be presented with articles
+that are clearly written to sales a product. You’re better trying to get trust
+from the reader and they will check the product via your signature if they
+find your articles interesting.</p>
+
+<p>You can have some links referencing content on your own product’s blog, but
+keeping the article focused on giving the highest possible value for the
+reader is, in my opinion, the best way to approach writing for another popular
+blog. With Osmosis I did this and the traffic that came from those articles
+were pretty good leads.</p>
+
+<p><strong>Manually contacting potential customers.</strong> Now I’m not saying creating a one or two template email and sending it to everyone on your market. For three weeks I’ve tried this and it worked surprisingly well although it took a huge amount of hours from my busy schedule. I couldn’t have done this for much longer without lowering the number of prospects I was contacting per day.</p>
+
+<p>The idea is to search for potential customers, real businesses that would be
+interested and would benefits from using your product. Take some times on
+their website, Twitter stream and maybe Facebook to see if you could connect
+with them regarding something they’ve posted recently. Yeah, I know it’s sound
+crazy, you often search for 15-25 minutes and you craft a super personalized
+email starting with the topic that you’ve found.</p>
+
+<p>As everyone is telling these days, make sure you focus on the *<em>YOU *</em>of
+course and keep it short. You can ask them to try your product because you
+thought it would solve X problems for them. You give a direct link to you
+sign-up page.</p>
+
+<p>It’s working and often the business will reply with valuable feedback or just
+to get in touch. I was contacting nearly 10 new businesses/consultant per day,
+hence I did not continued after three weeks. It is the most time consuming
+approach and I’m not even sure I would try it again, but it’s an alternative
+to Ad words and other ads services. You get the customers directly instead of
+them finding you. A long and tough process, but it can work.</p>
+
+<p>*<em>Extreme support. *</em>I have this mindset since I’ve started Twollow. Giving the best support and customer services I can so no one will ever say: “Well, it’s a one man operation, support must be slow and product would not move fast enough.”</p>
+
+<p>A part from Bunker App, I always use my own in-app support and ticket system.
+Before you say anything, no it’s not that long to write those things, and yes
+I had fun doing this. It’s true that you need to focus on important things,
+but if you do not do what you are thrilled to do you might not be able to
+continue.</p>
+
+<p>My response time was in average less than 12 hours (mostly less than 4 horus)
+which is good for a one main operation. heck you get 24-48 hours from larger
+companies. While giving solid support your customers should put more trust in
+you. It’s also the best time to request for a testimonial. As soon as a
+situation was fixed and the customer replied with email like this: “Thank you
+very much for your quick support you’ve made my day…”, you reply back and ask
+if they would accept to give you a short Twitter style testimonial. You should
+get it 75 % of the time.</p>
+
+<p><strong>AB testing.</strong> You should do this, <em>now</em>. Even if your traffic is not that high do it. If Patrick <a href="https://training.kalzumeus.com/newsletters/archive/why_you_do_not_ab_test">says you should</a>, you should.</p>
+
+<p><strong>Try to get reviewed on popular site.</strong> It’s not <strong>easy</strong>, but it is worth to try. Getting a review on Life Hacker for Bunker App bring a huge amount of traffic and a nice percentage of them open an account. It’s usually not the greatest conversion traffic, but the words is spreading.</p>
+
+<p>Don’t be afraid to contact the site editor if they’ve already made a review of
+your product and you product did change a lots since then. They might be
+interested in doing a follow-up review.</p>
+
+<p><strong>Fix and iterate quickly and send newsletters.</strong> The last thing that seems to have work for me is the speed at which I was fixing bugs and iterate the software to get incremental small additions. I was normally pushing new version in production each week or two week. Sometimes it was very small changes barely noticeable. For major update I was always teasing the customers and free trial users that did not convert with a newsletter.</p>
+
+<p>User that did not convert were interested in the product, they might not have
+converted because it was missing something or the timing was not good. By
+sending newsletters to your entire user base you make sure that a) everyone is
+aware of what’s going on and b) you notify the trial users that new feature
+are coming. It might just be the feature that they were looking for.</p>
+
+<p>Every time I’ve sent a newsletter for each product I always got a nice boost
+in traffic and some users were re-opening their account to check the new
+feature and how the app is now more complete than when they’ve previously
+tried it.</p>
+
+<h2>What did not worked</h2>
+
+<p>Again, I’m just listing things that did not worked for _my situation, _I’m not
+saying that it will not work for you.</p>
+
+<p><strong>Press release.</strong> Now before you mention something about my poor English writing style, note that I’ve hire someone to write the PR. In case your are curious, <a href="http://www.prweb.com/releases/2012/5/prweb9460386.htm">here’s the article</a>. The action of submitting a press release and getting other sources to re-publish the article do work. But the small burst of traffic that it sent me and the quality was the aspect that did not work. I’m not remembering the exact price for the writer but it was near $1K plus the fees from PRWeb.</p>
+
+<p>The first 24 hours it brings some nice traffic, but from day 2 and until day 5
+the traffic was just degrading rapidly. After 5 days I never got anything from
+this. So I nearly puts $1.5k in this with not much results.</p>
+
+<p>*<em>Hiring a mentor to help you. *</em>Don’t get me wrong, I acknowledge that there’s mentors that will help you reach another level. I’ve hire three persons which are known in our community to look at my products. Two for Bunker App and one for Osmosis.</p>
+
+<p>In all three consultation I’ve invested around $4.5k. Now this is a truck load
+of money for me since my product’s revenue was not even covering for hosting
+and other 3rd parties services. Still I needed to try that and see if I were
+doing something really wrong. Why my conversion rates was that low? How to
+increase the quality of my traffic and get targeted visitors?</p>
+
+<p>I’ve got some nice hints here and there, but nothing actually made any
+difference. After a consultation you normally have a series of tasks to
+complete from which the mentors gave you from their experiences and they
+should work. It didn’t work for me. Maybe it’s not something that can occurs
+in one session, but I was certainly not rich enough to afford having them for
+another session.</p>
+
+<p>The lessons I’ve learn is, trust yourself. You own the product, you know what
+is your best targeted potential customers, just go and keep trying. I could
+have put that money somewhere else and would have had better result, who
+knows.</p>
+
+<p>And note that I’m not talking about outsourcing part of your process to help
+get things done fast. This is recommended. I’m talking about paying a known
+person ~$1.5k so they can look at your product and give you recommendations
+and direction to take. I don’t want to name anyone here, it was my decisions
+to take these route, but I would never do this again.</p>
+
+<p>*<em>No enthusiast after 8-9 months for poor revenue product. *</em>For <em>all</em> of my products the first two months are so intense, so fun. And I’m not necessarily talking about development. After some months without noticeable results you start to be frustrated and despaired. Why me? Why everyone else is succeeding? I only had a $1k per month revenue goal, how come I’m not there yet and only have $80/month?</p>
+
+<p>Software as a Service is a slow process. The slow ramp of death they say.
+Yeah, I know that, but still, only $200/month revenue after 1-year! How am I
+supposed to get enthusiast about a product that barely starts to pay for
+itself. That mean no profit yet. I’m not that strong to do this. This is
+probably my biggest problem and I know it. What if I had waited another year,
+maybe the revenue would have quadruple? Maybe, but it’s too much for me.</p>
+
+<p>It’s not easy to keep continuing and especially when you got some external
+critical situation. Working on your product take lots of your family and
+consulting time. If something bad happen it’s harder to keep going with this
+non-revenue product. I had a surgery on September 30th and that’s mainly why
+I’ve sold Osmosis.</p>
+
+<p>You never know what the future is, and you never know if you would be better
+quitting a product and starting again, or keep going when the revenue is that
+low.</p>
+
+<h2>Low or no impact tasks</h2>
+
+<p>These things did not have a huge impact on my results, but I would still retry
+them for another product and try to get better at it.</p>
+
+<p>*<em>Content marketing. *</em>How to attack this when you start or do not have that much revenue to completely outsource the writing of great content for your targeted audience? For Osmosis I hired a professional writer that was&amp;nbsp<em>place</em>holder; writing once a month a solid post that would give value to the reader without trying to sell Osmosis. I wanted to have a point of entry to the site and once the trust would be established try to make them try the software if they were having the problem it solved.</p>
+
+<p>I would guess that I would have needed 1 article per week to have better
+results with this. But at 1 per month it was simply not worth the money
+invested in the short terms. Adding quality content is always important and
+that’s why I continued. The goal were to provide Google with a solid article
+made for the reader. It was not targeting any specifics keywords, we were
+deciding the topic together and the article was not specially written for SEO.</p>
+
+<p>If you have great writing skills you can certainly do this without having to
+hire someone. Still it is time consuming to write a quality article and even
+more for an epic post. Once you have an established audience it’s easier to
+connect with them and let them know about your product or just continue to
+provide solid content and the words is spreading. This is a long process but
+is certainly rewarding when done right. Make sure you are getting their email
+address.</p>
+
+<p>*<em>Social media. *</em>The three mentors from which I was speaking earlier all adviced on not putting any time at all on social media. For me it sounded not right, maybe they are correct in the assumption that it would probably not be your main traffic source and no one might ever convert from this channel. But ask yourself, when you checked at a business’s Twitter account and see that their last tweet was from 1 year ago what do you say? Be honest, we say: “Crap, they are not very active.”</p>
+
+<p>The way I used Twitter, Facebook, Google+ and LinkedIn was mainly to post
+related articles as often as I could. But it was not that often.</p>
+
+<p>Twitter can be a good place to connect with prospects if you are not too
+aggressive. You can enter a discussion without ever saying a thing about your
+product. They will find out one way or another. Either way, if you are
+planning on outsourcing that aspect. Make sure that the person who speaks for
+your product / business knows how to properly react under your brand’s
+mindset.</p>
+
+<p>*<em>Ads. *</em>Depending on your market you might have great results with ads campaign. The product that I’ve tried were in the freelancers / small agencies web design, development market. It was costly to say the least to try and get some keywords and key phrases that would bring traffic. I tried Google Ad words, Facebook ads and BuySellAds.</p>
+
+<p>I’m most certainly a complete newbie regarding Google Ad words. I mean, I
+never took the time to really put the most beneficial ads groups. Paying $1-2
+per click starts to be on the expensive side I must admit. Your product needs
+to have a good conversion rates to be able to pay that much. I never had a
+good conversion rates for my paid SaaS. So those kinds of ads were not really
+effective. I’ve played a bit with Google remarketing ads and those were better
+that traditional ads.</p>
+
+<p>Facebook ads helped to get likes on the product page, but were simply not good
+for getting visitors. And even if it were, the landing page that I’ve used was
+not a good fit for Facebook traffic. You would need a more social ready
+landing page when you get traffic from Facebook. I never took time to do such
+thing.</p>
+
+<p>The BuySellAds was OK I guess. Again not much traffic but since my conversion
+rates always were low, you can bring 10k visitors and you still need to be
+good at converting them to get money out of this. You have to carefully pick
+the sites that will show your banner ads though. It’s worth taking sometimes
+and reading couple of past article from the site and just check the overall
+business that are advertising there.</p>
+
+<h2>Going for my enthusiast this time</h2>
+
+<p>As an entrepreneur I cannot stay there without having projects ahead on me.
+But this time I will try something different. I will listen to my enthusiast.</p>
+
+<p>One thing that I’ve learned with all my failures is that I better love what
+I’m doing, it’s the only way I will be able to keep continuing when rough time
+occurs. I will go for something I’m passionate about. I will leave the
+Freelancer market to others…</p>
+
+<p>If I’m not passionate enough I will simply close the product and sell it after
+1 year like I did with all my products so far. I don’t want that. I’m tired of
+abandoning and I simply want to have fun again doing what I enjoy the most in
+life, developing and owning a software product.</p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2013/11/congratulation-youve-failed-again-saas</wp:post_id>
+        <wp:post_date>2013-11-28T08:43:21-05:00</wp:post_date>
+        <wp:post_date_gmt>2013-11-28T08:43:21-05:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename="micropreneur"><![CDATA[["micropreneur"]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+      <item>
+        <title><![CDATA[Enable Code First Migrations check box is hidden from Publishing Wizard]]></title>
+        <link>http://dominicstpierre.com/2012/11/enable-code-first-migrations-check-box.html</link>
+        <pubDate>2012-11-15T05:25:08-05:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p>I’ve been really excited with the new Windows Azure Websites recently. As a
+long time <a href="http://www.appharbor.com">AppHarbor</a> user, deploying ASP.NET MVC
+app to the cloud via a git push is extremely nice.</p>
+
+<p>Something strange happened to me on my last project though. After creating a
+basic working prototype of the app I was ready to deploy the application.
+Since it’s a small prototype for now I was using the Visual Studio Publishing
+Wizard.</p>
+
+<p>I had enable migrations on the project, created some models and my
+<a href="http://msdn.microsoft.com/en-%0Aus/library/system.data.entity.dbcontext(v=vs.103).aspx">DbContext</a> class, everything was
+working nicely. On the Publishing Wizard I was seeing this:</p>
+
+<p><img src="/images/without-code-first.png" alt="without-code-first" title="Publishing Wizzard without code first"></p>
+
+<p>The <strong>Enable Code First Migrations</strong> check box was not present, and my
+DbContext class was not displayed. The wizard should look like this:</p>
+
+<p><img src="/images/with-code-first.png" alt="with-code-first" title="Publishing Wizzard with code first"></p>
+
+<p>After a couple of time (hours?) of digging, I finally find where the thing is
+configured.</p>
+
+<p><img src="/images/publish-settings.png" alt="publish-settings" title="Publishing settings"></p>
+
+<h3>Manually editing the pubxml file to make the check box appear</h3>
+
+<p>You can enable that check box by editing the Properties\YourProject -
+WebDeploy.pubxml look for the PublishDatabaseSettings</p>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml">    <span class="nt">&lt;PublishDatabaseSettings&gt;</span>
+      <span class="nt">&lt;Objects</span> <span class="na">xmlns=</span><span class="s">""</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;ObjectGroup</span> <span class="na">Name=</span><span class="s">"Namespace.Models.YourDBClass"</span> <span class="na">Order=</span><span class="s">"1"</span> <span class="na">Enabled=</span><span class="s">"True"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;Destination</span> <span class="na">Path=</span><span class="s">"your-connection-string-goes-here"</span> <span class="nt">/&gt;</span>
+          <span class="nt">&lt;Object</span> <span class="na">Type=</span><span class="s">"DbCodeFirst"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;Source</span> <span class="na">Path=</span><span class="s">"DBMigration"</span> <span class="na">DbContext=</span><span class="s">"Namespace.Models.YourDBClass, AssamblyName"</span> <span class="na">MigrationConfiguration=</span><span class="s">"Namespace.Migrations.Configuration, Assambly"</span> <span class="na">Origin=</span><span class="s">"Convention"</span> <span class="nt">/&gt;</span>
+          <span class="nt">&lt;/Object&gt;</span>
+        <span class="nt">&lt;/ObjectGroup&gt;</span>
+      <span class="nt">&lt;/Objects&gt;</span>
+    <span class="nt">&lt;/PublishDatabaseSettings&gt;</span>
+</code></pre></div>
+<p>Change Namespace.Models.YourDBClass by your class that inherits DbContext,
+change Namespace.Migratins.Configuration to fit your migration configuration
+namespace and Assambly with your Assambly name.</p>
+
+<p>Save and open the publish wizard you will have that check box.</p>
+
+<p>I’ve took the VS Publishing Wizard from <a href="http://stackoverflow.com/questions/13230902/publishing-my-database-%0Apackage-deploy-with-code-first-migrations/13388315#13388315">that stackoverflow
+question</a> I’ve answered.</p>
+
+<p>Technorati Tags: <a href="http://technorati.com/tags/Windows+Azure">Windows
+Azure</a>,<a href="http://technorati.com/tags/Publishing+Wizard">Publishing
+Wizard</a>,<a href="http://technorati.com/tags/EF+Code+First+Migrations">EF Code First
+Migrations</a></p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2012/11/enable-code-first-migrations-check-box</wp:post_id>
+        <wp:post_date>2012-11-15T05:25:08-05:00</wp:post_date>
+        <wp:post_date_gmt>2012-11-15T05:25:08-05:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename="azure"><![CDATA[["azure"]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+      <item>
+        <title><![CDATA[ASP.NET MVC Multilingual websites]]></title>
+        <link>http://dominicstpierre.com/2012/11/aspnet-mvc-multilingual-websites.html</link>
+        <pubDate>2012-11-12T11:37:50-05:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p>I used to have a series of posts on how to achieve a functional multilingual
+website, unfortunately it has been lost. Here is a single to the point post on
+the subject, including how I did JavaScript translation when I was running
+Bunker App.</p>
+
+<h3>The database</h3>
+
+<p>It might look simple at first to just add a new column on your tables
+containing the language or culture for the data. But it’s actually a little
+bit bigger. It’s normally a little of the columns that needs to be translated,
+so you often have to split your tables. An example:</p>
+
+<h4>Website content page</h4>
+
+<p>You might have the ”master” data like who created the page, the date of
+creation and last modification etc. Those meta information does not need to be
+translated. The page title, URL and the page body content on the other hand
+needs to be translated. You might end up with the following tables layout:</p>
+
+<p>|Pages|PageContent|
+|----|----|
+|id|PageId|
+|ParentId|Culture|
+|CreatedBy|URL|
+|Created|Title|
+|ModifiedBy|Body|
+|Modified| |</p>
+
+<p>That way you can have 2 or 20 translated version of a page without repeating
+the non-translated information. You might also consider adding an index to the
+Culture field since you would probably have lots of filtering by that field.</p>
+
+<h3>MVC multilingual routes</h3>
+
+<p>I’m usually using the simple {lang} parameter to differentiate the route in a
+website with multiple language supported.</p>
+<div class="highlight"><pre><code class="language-c#" data-lang="c#">    <span class="n">routes</span><span class="p">.</span><span class="nf">MapRoute</span><span class="p">(</span>
+      <span class="n">name</span><span class="p">:</span> <span class="s">"ML"</span><span class="p">,</span>
+      <span class="n">url</span><span class="p">:</span> <span class="s">"{lang}/{controller}/{action}/{id}"</span><span class="p">,</span>
+      <span class="n">defaults</span><span class="p">:</span> <span class="k">new</span> <span class="p">{</span> <span class="n">lang</span> <span class="p">=</span> <span class="s">"en"</span><span class="p">,</span> <span class="n">controller</span> <span class="p">=</span> <span class="s">"Pages"</span><span class="p">,</span> <span class="n">action</span> <span class="p">=</span> <span class="s">"Show"</span><span class="p">,</span> <span class="n">id</span> <span class="p">=</span> <span class="n">UrlParameter</span><span class="p">.</span><span class="n">Optional</span> <span class="p">}</span>
+    <span class="p">);</span>
+</code></pre></div>
+<h4>You have a base controller right?</h4>
+
+<p>On a base controller class you might override the
+<a href="http://msdn.microsoft.com/en-%0Aus/library/system.web.mvc.controller.onactionexecuting(v=vs.98).aspx">OnActionExecuting</a> and grab
+the requested language, set the current thread’s
+<a href="http://msdn.microsoft.com/en-%0Aus/library/system.threading.thread.currentculture.aspx">CurrentCulture</a> and
+<a href="http://msdn.microsoft.com/en-%0Aus/library/system.threading.thread.currentuiculture.aspx">CurrentUICulture</a> appropriately:</p>
+<div class="highlight"><pre><code class="language-c#" data-lang="c#">    <span class="k">protected</span> <span class="kt">string</span> <span class="n">Language</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">OnActionExecuting</span><span class="p">(</span><span class="n">ActionExecutingContext</span> <span class="n">filterContext</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="k">base</span><span class="p">.</span><span class="nf">OnActionExecuting</span><span class="p">(</span><span class="n">filterContext</span><span class="p">);</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="n">filterContext</span><span class="p">.</span><span class="n">RouteData</span><span class="p">.</span><span class="n">Values</span><span class="p">.</span><span class="nf">ContainsKey</span><span class="p">(</span><span class="s">"lang"</span><span class="p">))</span>
+        <span class="n">Language</span> <span class="p">=</span> <span class="n">filterContext</span><span class="p">.</span><span class="n">RouteData</span><span class="p">.</span><span class="n">Values</span><span class="p">[</span><span class="s">"lang"</span><span class="p">].</span><span class="nf">ToString</span><span class="p">().</span><span class="nf">ToLower</span><span class="p">();</span>
+      <span class="k">else</span>
+        <span class="n">Language</span> <span class="p">=</span> <span class="s">"en"</span><span class="p">;</span>
+
+      <span class="n">ViewBag</span><span class="p">.</span><span class="n">language</span> <span class="p">=</span> <span class="n">Language</span><span class="p">;</span>
+
+      <span class="n">Thread</span><span class="p">.</span><span class="n">CurrentThread</span><span class="p">.</span><span class="n">CurrentCulture</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">CultureInfo</span><span class="p">(</span><span class="n">Language</span><span class="p">);</span>
+      <span class="n">Thread</span><span class="p">.</span><span class="n">CurrentThread</span><span class="p">.</span><span class="n">CurrentUICulture</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">CultureInfo</span><span class="p">(</span><span class="n">Language</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div>
+<p>Now you have the Language property pointing to the requested culture (i.e. en-
+US / fr-CA, etc) and on the ViewBag.language dynamic property to use on your
+views.</p>
+
+<h3>Querying data</h3>
+
+<p>No matter how you proceed to query any data from your data store you will
+simply need the Language property from your controller to get the desired data
+filtered in the right culture.</p>
+<div class="highlight"><pre><code class="language-c#" data-lang="c#">     <span class="k">public</span> <span class="n">PageController</span> <span class="p">:</span> <span class="n">BaseController</span>
+
+     <span class="p">{</span>
+
+       <span class="k">private</span> <span class="n">IPageRepository</span> <span class="n">pages</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+     <span class="p">&amp;</span><span class="n">nbsp_place_holder</span><span class="p">;</span>
+
+       <span class="k">public</span> <span class="nf">PageController</span><span class="p">()</span> <span class="p">:</span> <span class="k">this</span><span class="p">(</span><span class="k">new</span> <span class="nf">SqlPageRepository</span><span class="p">())</span> <span class="p">{</span> <span class="p">}</span>
+
+     <span class="p">&amp;</span><span class="n">nbsp_place_holder</span><span class="p">;</span>
+
+       <span class="k">public</span> <span class="nf">PageController</span><span class="p">(</span><span class="n">IPageRepository</span> <span class="n">repo</span><span class="p">)</span>
+
+       <span class="p">{</span>
+
+         <span class="n">pages</span> <span class="p">=</span> <span class="n">repo</span><span class="p">;</span>
+
+       <span class="p">}</span>
+
+     <span class="p">&amp;</span><span class="n">nbsp_place_holder</span><span class="p">;</span>
+
+       <span class="k">public</span> <span class="n">ActionResult</span> <span class="nf">Show</span><span class="p">(</span><span class="kt">string</span> <span class="n">id</span><span class="p">)</span>
+
+       <span class="p">{</span>
+
+         <span class="kt">var</span> <span class="n">vm</span> <span class="p">=</span> <span class="n">pages</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">Language</span><span class="p">);</span>
+
+         <span class="k">return</span> <span class="nf">View</span><span class="p">(</span><span class="n">vm</span><span class="p">);</span>
+
+        <span class="p">}</span>
+
+     <span class="p">}</span>
+</code></pre></div>
+<p>On line 1 by inheriting from the BaseController the Language property will be
+set the the requested culture, then on line 14 we can see that we can pull the
+right data from the data store.</p>
+
+<h3>One view to rule them all</h3>
+
+<p>You do not need multiple views per language supported. That option would not
+scale right and would have lots of overhead. On a view you can easily have the
+following elements properly translated:</p>
+
+<h4>The text</h4>
+
+<p>This is the easiest part. The <a href="http://msdn.microsoft.com/en-%0Aus/library/7zxb70x7(v=vs.80).aspx">Resource Files</a> are very handy for that situation. I used
+two approach in the past.</p>
+
+<p><strong>For simple website, global resource files</strong></p>
+
+<p>If you have a website that is not too big in number of pages needed to be
+translated, you might want to use the easy way. Add the App_GlobalResources to
+your project and put one or more file there with translation.</p>
+
+<p>Home.resx | Home.fr.resx | Home.es.resx</p>
+
+<p>The fail over file “Home.resx” is the one with your default language and the
+one that will be used for a specific resource value if the key does not exists
+on the language file.</p>
+
+<p>I find it easier to create a website with only the default file involved, and
+once the site gets to the v1 release I copy the file to the other supported
+languages. That way it prevent from having to manually maintain files while
+you constantly add new keys to the main file.</p>
+
+<p>To get a value from a view you simply use that syntax:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html">    <span class="nt">&lt;h1&gt;</span>@Resources.Home.Title<span class="nt">&lt;/h1&gt;</span>
+</code></pre></div>
+<p>Once all your website if fine in your default language you can start
+translating to other languages. It’s easy enough to send the .RESX files to
+professional translator.</p>
+
+<p><strong>For larger website, use local resource files</strong></p>
+
+<p>Sometime things get out of control when you start to have too much global
+resource files. You might want to use local resource files on each of your
+views subfolder.</p>
+
+<h4>Images</h4>
+
+<p>My approach for handling images on your views in simple enough. Ask the
+designer to maximize images without text. For images that need to have text on
+it, I simply ask the designer to create multiple file like image-name-en-
+US.png, image-name-fr-CA.png, image-name-es-ES.png.</p>
+
+<p>From your views you already have the proper culture on the ViewBag.language
+property, so it’s simple enough to get the right image like this:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html">    <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"/images/image-name-@(ViewBag.language).png"</span> <span class="na">alt=</span><span class="s">"@Resources.Home.ImageNameAlt"</span> <span class="nt">/&gt;</span>
+</code></pre></div>
+<p>You just have to make sure every images has the same naming convention. Also,
+if you need to set different height and with for different culture, you can
+still use the resource files for that, like I did for the alt attribute.</p>
+
+<h4>Multilingual JavaScript</h4>
+
+<p>Ho boy! First of all I’m not really what we could call a JavaScript expert,
+even not a JS ultra knowledgeable person. But I come to really love the
+language over time and here is what I did to have a functional multilingual
+one page JavaScript app when I was the owner of Bunker App.</p>
+
+<p>I tried to replicate what resource files was to the .NET world and simply
+created one JS file per culture containing a dictionary of translated value.
+Here is a simple example:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="c1">// languagepack-en.js  </span>
+    <span class="kd">var</span> <span class="nx">Lang</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">globalDateFormat</span> <span class="o">=</span> <span class="s1">'mm-dd-yy'</span><span class="p">;</span>
+      <span class="nl">greeting</span><span class="p">:</span> <span class="s1">'Hello'</span>
+    <span class="p">};</span>
+
+    <span class="c1">// languagepack-fr.js  </span>
+    <span class="kd">var</span> <span class="nx">Lang</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">globalDateFormat</span> <span class="o">=</span> <span class="s1">'yy-mm-dd'</span><span class="p">;</span>
+      <span class="nl">greeting</span><span class="p">:</span> <span class="s1">'Bonjour'</span>
+    <span class="p">};</span>
+</code></pre></div>
+<p>Just create an object containing the key and value of the text you are using
+on your JavaScript scripts. You can use this like this:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    <span class="nx">alert</span><span class="p">(</span><span class="nx">Lang</span><span class="p">.</span><span class="nx">greeting</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="nx">userName</span><span class="p">);</span>
+</code></pre></div>
+<p>You only need to include the right language pack file before your scripts,
+like this:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html">    <span class="nt">&lt;script </span><span class="na">language=</span><span class="s">"javascript"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">src=</span><span class="s">"/content/js/langpack-@(ViewBag.language.SubString(0, 2)).js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+
+    <span class="nt">&lt;script </span><span class="na">language=</span><span class="s">"javascript"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">src=</span><span class="s">"/content/js/yourscript.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+
+</code></pre></div>
+<p>We only use the left two character of the culture, because you might not have
+multiple JS file for English and French for different countries. But you can
+if you want.</p>
+
+<h3>This is just my way of doing this</h3>
+
+<p>Since we have two official language here in Quebec (French and English) almost
+every site I&#39;ve built required to be at least support those two language. I
+have been successful using those technique, but I’m not implying in any way
+that this is the only or a good approach to use.</p>
+
+<p>Even though having a multilingual website appear to be simple at first, it
+clearly add lots of gotcha and things to think a bit. But in the end it’s not
+so bad to implement.</p>
+
+<p>Technorati Tags: <a href="http://technorati.com/tags/Multilingual+website">Multilingual
+website</a>,<a href="http://technorati.com/tags/ASP.NET+MVC">ASP.NET
+MVC</a>,<a href="http://technorati.com/tags/Multilingual+JavaScript">Multilingual
+JavaScript</a></p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2012/11/aspnet-mvc-multilingual-websites</wp:post_id>
+        <wp:post_date>2012-11-12T11:37:50-05:00</wp:post_date>
+        <wp:post_date_gmt>2012-11-12T11:37:50-05:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename="asp-net"><![CDATA[["asp-net",]]></category>
+
+          <category domain="post_tag" nicename="mvc"><![CDATA["mvc"]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+      <item>
+        <title><![CDATA[5 years of blog posts vanished]]></title>
+        <link>http://dominicstpierre.com/2012/04/5-years-of-blog-posts-vanished.html</link>
+        <pubDate>2012-04-04T07:26:37-04:00</pubDate>
+        <dc:creator></dc:creator>
+        <guid/>
+        <description></description>
+        <content:encoded><![CDATA[<p>I guess those things happen one day or another if you are not careful with
+your backups. In short I’ve lost all my blog posts since the beginning of my
+blogging starts on October 2007.</p>
+
+<h3>What is ~300 blog posts anyway?</h3>
+
+<p>Sure compare to loosing important code files or entire client projects data
+near a due date would have been much more disastrous. Still, for me, all those
+blog posts were representing the fact that I was there since 2007. I
+remembered having comments from some known folks from the .NET community etc.</p>
+
+<h3>Fair enough, time to restart</h3>
+
+<p>I’ve lost the blog posts from a server transfer near September. I was sure I
+had backed up and copied the SQL files from my SubText blog. Having all the
+others important backup and web app transferred (except my blog), I’ve
+cancelled my server with peace of mind. Two weeks after that I was finally
+ready to restart my blog from the backup SQL file.</p>
+
+<p>Oops, no file found. How come I’ve picked every other SQL backups and not my
+blog. I guess those things happen when you are doing too much things at the
+same time.</p>
+
+<p>I will take that opportunity and try to re-established myself a bit.</p>
+]]></content:encoded>
+        <excerpt:encoded><![CDATA[]]></excerpt:encoded>
+        <wp:post_id>/2012/04/5-years-of-blog-posts-vanished</wp:post_id>
+        <wp:post_date>2012-04-04T07:26:37-04:00</wp:post_date>
+        <wp:post_date_gmt>2012-04-04T07:26:37-04:00</wp:post_date_gmt>
+        <wp:post_name/>
+
+
+
+          <category domain="post_tag" nicename=""><![CDATA[[]]]></category>
+
+
+        <wp:status>publish</wp:status>
+        <wp:post_parent>0</wp:post_parent>
+        <wp:menu_order>0</wp:menu_order>
+        <wp:post_type>post</wp:post_type>
+        <wp:post_password/>
+        <wp:is_sticky/>
+      </item>
+
+  </channel>
+</rss>
