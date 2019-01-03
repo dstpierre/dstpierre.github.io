@@ -1,4 +1,5 @@
 ---
+permalink: "/spinning-a-big-digitalocean-droplet-to-perform-a-task-than-destroy-it-from-go-5652c0b64686"
 layout: post
 title: "Spinning a big DigitalOcean droplet to perform a task than destroy it from Go"
 date: 2017-06-17 11:26:37 UTC

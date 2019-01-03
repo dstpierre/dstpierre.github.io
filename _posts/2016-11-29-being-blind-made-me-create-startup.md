@@ -1,4 +1,5 @@
 ---
+permalink: "/going-blind-inspired-me-to-quit-my-own-startup-to-build-something-new-df3911be27b"
 layout: post
 title: "Going Blind Inspired Me to Quit My Own Startup to Build Something New"
 date: 2016-11-29 11:26:37 UTC

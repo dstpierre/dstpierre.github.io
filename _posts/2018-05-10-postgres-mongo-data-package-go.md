@@ -1,4 +1,5 @@
 ---
+permalink: "/handling-postgresql-and-mongodb-in-one-go-data-package-excerpt-from-my-book-f23bfe8d7cb7"
 layout: post
 title: "Handling PostgreSQL and MongoDB in one Go data package — excerpt from my book."
 date: 2018-05-10 11:26:37 UTC

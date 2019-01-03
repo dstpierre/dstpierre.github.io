@@ -1,4 +1,5 @@
 ---
+permalink: "/congratulation-youve-failed-again-saas-66bc1fbce4"
 layout: post
 title: "Congratulation you’ve failed again (SaaS)"
 date: 2013-11-28 11:26:37 UTC

@@ -1,4 +1,5 @@
 ---
+permalink: "/how-i-wrote-a-book-on-go-your-turn-now-103a7b06873"
 layout: post
 title: "How I wrote a book on Go, your turn now"
 date: 2018-09-22 11:26:37 UTC

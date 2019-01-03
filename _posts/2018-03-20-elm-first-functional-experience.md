@@ -1,4 +1,5 @@
 ---
+permalink: "/thanks-elm-i-had-my-first-taste-at-functional-programming-your-turn-now-893f2bf8f4be"
 layout: post
 title: "Thanks Elm, I had my first taste at functional programming, your turn now"
 date: 2018-03-20 11:26:37 UTC

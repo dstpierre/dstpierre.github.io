@@ -1,4 +1,5 @@
 ---
+permalink: "/using-typescript-to-publish-a-testable-react-npm-package-f3811b3c64e3"
 layout: post
 title: "Using TypeScript to publish a testable React npm package"
 date: 2017-04-01 11:26:37 UTC

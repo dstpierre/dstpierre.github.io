@@ -2,9 +2,11 @@ name: Dominic St-Pierre
 description: Dominic St-Pierre's Blog
 markdown: redcarpet
 timezone: America/Montreal
-permalink: /:year/:month/:title.html
-url: http://www.dominicstpierre.com
+permalink: /:title.html
+url: https://dominicstpierre.com
 safe: true
 author: Dominic St-Pierre
 email: dominicstpierre@gmail.com
 highlighter: rouge
+paginate: 20
+paginate_path: "/blog/:num/"

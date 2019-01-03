@@ -1,4 +1,5 @@
 ---
+permalink: "/just-like-rocky-you-need-to-go-the-distance-with-your-startup-5800c3863049"
 layout: post
 title: "Just like Rocky, you need to go the distance with your startup"
 date: 2016-11-12 11:26:37 UTC

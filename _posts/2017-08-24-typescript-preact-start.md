@@ -1,4 +1,5 @@
 ---
+permalink: "/how-to-start-with-typescript-and-preact-a9ea3e0ba4dc"
 layout: post
 title: "How to start with TypeScript and Preact"
 date: 2017-08-24 11:26:37 UTC

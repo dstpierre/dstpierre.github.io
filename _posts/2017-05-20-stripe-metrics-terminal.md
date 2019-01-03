@@ -1,4 +1,5 @@
 ---
+permalink: "/see-your-stripe-mrr-and-monthly-stats-in-your-terminal-c3110c0891b9"
 layout: post
 title: "See your Stripe MRR and monthly stats in your terminal"
 date: 2017-06-17 11:26:37 UTC

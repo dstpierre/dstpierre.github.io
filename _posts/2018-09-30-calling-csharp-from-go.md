@@ -1,4 +1,5 @@
 ---
+permalink: "/calling-net-4-5-c-methods-from-go-a-wip-2acb89392537"
 layout: post
 title: "Calling .NET 4.5 C# methods from Go, a WIP"
 date: 2018-09-30 11:26:37 UTC
