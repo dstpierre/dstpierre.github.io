@@ -4,7 +4,7 @@ markdown: redcarpet
 timezone: America/Montreal
 permalink: /:year/:month/:title.html
 url: http://www.dominicstpierre.com
-pygments: true
 safe: true
 author: Dominic St-Pierre
 email: dominicstpierre@gmail.com
+highlighter: rouge
