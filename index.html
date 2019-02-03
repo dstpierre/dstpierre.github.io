@@ -15,7 +15,7 @@ title: "Dominic St-Pierre | Engineer | Author | Entrepreneur"
                 {% for post in site.posts limit:9 %}
                 <li class="post-item">
                     <span class="meta"><time datetime="{{ post.date }}">
-                            {{ post.date | date: "%M, %d %Y" }}
+                            {{ post.date | date_to_string }}
                         </time></span>
 
                     <a href="{{ post.url }}"><span>{{ post.title }}</span></a>
