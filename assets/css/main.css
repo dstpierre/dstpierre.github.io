@@ -335,8 +335,8 @@ section.main .container {
 }
 section.main .content {
   color: #111;
-  font-size: 18px;
-  font-family: Georgia, 'Times New Roman', Times,, serif;
+  font-size: 1.2em;
+  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 section.main .content .title-container {
   display: -webkit-flex;
