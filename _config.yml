@@ -10,6 +10,9 @@ highlighter: rouge
 paginate: 20
 paginate_path: "/blog/:num/"
 
+plugins:
+  - jekyll-redirect-from
+
 gems:
   - jekyll-github-metadata
   - jekyll-mentions

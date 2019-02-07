@@ -1,4 +1,5 @@
 ---
+redirect_from: "/2012/11/aspnet-mvc-multilingual-websites.html"
 layout: post
 title: ASP.NET MVC Multilingual websites
 date: 2012-11-12 16:37:50 UTC
