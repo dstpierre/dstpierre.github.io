@@ -37,6 +37,8 @@ I opened my editor and wrote a Go package and I named it
 [termrr](https://github.com/dstpierre/termrr) for Terminal MRR. This is a sample
 of the output it generates:
 
+{% include push-content.html %}
+
 ```shell
 $> ./termrr -key sk_test_32ajah7QA-not-a-real-key
 MRR is  425.00

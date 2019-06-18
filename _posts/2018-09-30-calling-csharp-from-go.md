@@ -65,6 +65,8 @@ This is a C# .NET console application that continuously read the standard input
 for method to execute. The communication between Go and C# uses JSON and Go
 needs to send the following object to execute a method:
 
+{% include push-content.html %}
+
 ```json
 {
 	"typename": "Your.Library.Here.ClassName",

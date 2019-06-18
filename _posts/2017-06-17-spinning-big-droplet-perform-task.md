@@ -58,6 +58,8 @@ key you have there.
 We have a server that’s responsible of running some cron jobs. One of them is a
 daily call to a bash script that starts the deployment:
 
+{% include push-content.html %}
+
 ```sh
 #!/bin/bash
 

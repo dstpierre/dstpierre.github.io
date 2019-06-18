@@ -160,6 +160,8 @@ Let's implement the add page button click. This should be enough of a demo to
 get you started. I'll go into common issues I faced during my first two weeks 
 of using Elm full-time at the end of this post.
 
+{% include push-content.html %}
+
 ```elm
 viewToolbar : Model -> Html Msg
 viewToolbar model =

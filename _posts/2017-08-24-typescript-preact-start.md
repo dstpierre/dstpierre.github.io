@@ -122,6 +122,8 @@ The project structureshould look like this:
 We will now create our app entry point `bootstrap.tsx` inside our `src`
 directory:
 
+{% include push-content.html %}
+
 ```js
 import { h, render } from "preact";
 import { App } from "./app";

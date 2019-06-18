@@ -101,6 +101,8 @@ type Connection = sql.DB
 type Key = int64
 ```
 
+{% include push-content.html %}
+
 **File: data/model/types_mgo.go**
 
 ```go
