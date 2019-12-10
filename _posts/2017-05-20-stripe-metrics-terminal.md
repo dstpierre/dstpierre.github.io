@@ -9,7 +9,7 @@ summary: "..."
 ---
 
 ![Code editor showing the main calculation logic and the terminal output for
-termrr](https://cdn-images-1.medium.com/max/2000/1*iTIzOn0vchY7fkXh4q-uBA.png)
+termrr](/assets/img/termrr.png)
 
 
 Terminal for me is where I’m feeling at home, certainly because I’m [visually

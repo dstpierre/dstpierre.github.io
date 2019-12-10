@@ -1,33 +1,72 @@
 ---
 layout: layout
-title: "Dominic St-Pierre | Engineer | Author | Entrepreneur"
-date: 2019-02-03 13:48:50 UTC
+title: "Dominic St-Pierre | Developer | Author | Entrepreneur"
+date: 2019-12-01 13:48:50 UTC
 ---
 
-<section class="main">
-    <div class="container">
-        <div class="content">
 
+<div class="bg-gray-800 p-12">
+	<div class="mx-auto container">
+		<h1 class="text-white text-6xl">
+			Coding is <span class="text-blue-400">fun</span>.
+		</h1>
+		<h2 class="text-white text-6xl">
+			Building side projects is even more <span class="text-blue-400">glorious</span>.
+		</h2>
+	</div>
+</div>
+<div class="mx-auto container mt-20">
+<blockquote class="p-4 bg-neutral-100 text-gray-600 border-l-4 border-gray-500 italic quote relative text-xl">
+	<div class="stylistic-quote-mark" aria-hidden="true">
+		&ldquo;
+	</div>
+	<p class="mb-4">
+		"I'm a passionate programmer/entrepreneur. I love teaching how to use new
+		technologies to build web applications."
+	</p>
+	<!-- cite class="flex items-center">
+		<img alt="Avatar Dominic St-Pierre" class="mr-4 w-12 bg-neutral-500 rounded-full" src="/assets/img/me.jpg" />
+		<div className="flex flex-col items-start">
+			<span class="mb-1 text-sm font-bold italic">
+				Dominic
+			</span>
+		</div>
+	</cite -->
+</blockquote>
+</div>
 
+{% include latestrelease.html %}
 
+<div class="mx-auto container py-20">
+	<span class="mx-auto block w-full text-center text-gray-900 text-4xl">
+		I want to help you reach the next level.
+	</span>
 
-            <div class="page-heading">Latest Posts</div>
-            <ul>
-                {% for post in site.posts limit:9 %}
-                <li class="post-item">
-                    <span class="meta"><time datetime="{{ post.date }}">
-                            {{ post.date | date_to_string }}
-                        </time></span>
+	<div class="lg:flex py-12 content">
+		<div class="w-full p-8 lg:w-1/3">
+			<h3>Concise content</h3>
+			<p>
+				The courses I create are concise and respect your time. There's no
+				end of chapter recap or repeating what you can already find on the
+				languages guides.
+			</p>
+		</div>
+		<div class="w-full p-8 lg:w-1/3">
+			<h3>Always pragmatic</h3>
+			<p>
+				I teach by doing real-world projects and encourage you to start coding
+				while taking the courses. There's just the right amount of theoretical
+				content.
+			</p>
+		</div>
+		<div class="w-full p-8 lg:w-1/3">
+			<h3>Reach the next level</h3>
+			<p>
+				Want to build a side project or learn that new technology you've been 
+				hearing about, I've got you covered.
+			</p>
+		</div>
+	</div>
+</div>
 
-                    <a href="{{ post.url }}"><span>{{ post.title }}</span></a>
-                </li>
-                {% endfor %}
-
-
-
-
-            </ul>
-
-        </div>
-    </div>
-</section>
+{% include latestblog.html %}

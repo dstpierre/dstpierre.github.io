@@ -1,7 +1,7 @@
 ---
 permalink: "/going-blind-inspired-me-to-quit-my-own-startup-to-build-something-new-df3911be27b"
 layout: post
-title: "Going Blind Inspired Me to Quit My Own Startup to Build Something New"
+title: "Going blind inspired me to quit my own startup to build something new"
 date: 2016-11-29 11:26:37 UTC
 updated: 2016-11-29 11:26:37 UTC
 comments: false
@@ -9,6 +9,8 @@ summary: "..."
 ---
 
 ## Why I left a growing startup to build Roadmap
+
+![Image showing tunel vision](/assets/img/blind-tunel-vision.jpeg)
 
 I’ve been going blind my entire life. Most people have a 180-degree field of
 vision. Legally blind, I have 2% of a normal vision range in one eye.
@@ -34,7 +36,7 @@ first thing I cared about that [Retinitis
 pigmentosa](https://en.wikipedia.org/wiki/Retinitis_pigmentosa) would take from
 me, not the last.
 
-![](https://cdn-images-1.medium.com/max/800/1*po_Jg_ek64ZZjjcSPRO5Bg.jpeg)
+![](/assets/img/blind-vision.jpeg)
 
 > At a very young age I rationalized that time, specifically my time, was
 > important. Impending blindness created a sense of urgency.

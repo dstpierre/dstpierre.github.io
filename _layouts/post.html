@@ -2,34 +2,19 @@
 layout: layout
 ---
 
-<section class="main post non-narrow zero-top-spacing">
-        <div class="container">
-            <div class="content">
-                <div class="front-matter">
-                    <div class="title-container">
-                        <h1 class="page-heading">{{ page.title }}</h1>
-    
-                        <div class="initials"><a href="https://dominicstpierre.com"></a></div>
-                    </div>
-                    <div class="meta">
-                        
-                        <div class="date" title="{{ page.date }}">{{ page.date | date_to_string }}</div>
-                        
-                        
-                <div class="reading-time"><div class="middot"></div></div>
-                        
-                    </div>
-                </div>
-                <div class="markdown">
-                    {{ content }}
+<div class="bg-gray-800 p-12">
+	<div class="mx-auto container">
+		<h1 class="text-white text-6xl">
+			{{ page.title }}
+		</h1>
+		<p class="text-gray-300" title="{{ page.date }}">
+			{{ page.date | date_to_string }}
+		</p>
+	</div>
+</div>
 
-                        <br>
-                
-                        <p class="back-to-posts"><a href="/blog">Back to posts</a></p>
-                    </div>
-                    <br>
-                    
-                </div>
-            </div>
-        </section>
+<div class="mx-auto container py-20 max-w-xl content">
+	{{ content }}	
 
+	<p class="pt-8"><a href="/blog">Back to posts</a></p>
+</div>

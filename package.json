@@ -1,0 +1,22 @@
+{
+  "name": "dstpierre.github.io",
+  "version": "1.0.0",
+  "description": "dstpierre.github.io ===================",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dstpierre/dstpierre.github.io.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dstpierre/dstpierre.github.io/issues"
+  },
+  "homepage": "https://github.com/dstpierre/dstpierre.github.io#readme",
+  "dependencies": {
+    "tailwindcss": "^1.1.4"
+  }
+}

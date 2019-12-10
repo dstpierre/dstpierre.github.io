@@ -38,7 +38,7 @@ chapters and H2 as sub-chapter.
 I created one chapter per `.md` file. This is an example of chapter one and how
 the table of contents is rendered on the PDF.
 
-![Showing a sample markdown file and the table of contents from the PDF.](https://cdn-images-1.medium.com/max/2000/1*AORMYXQ9WsH84fXGdLeomA.png)
+![Showing a sample markdown file and the table of contents from the PDF.](/assets/img/write-book-md.png)
 
 
 I used a GitHub private repository because I knew I wanted to invite some people
@@ -155,7 +155,7 @@ background and the line numbers.
 
 This render code blocks like this one:
 
-![Code block sample](https://cdn-images-1.medium.com/max/1000/1*Huw88HQjVfkvCABMVXerSg.png)
+![Code block sample](/assets/img/write-book-code.png)
 
 
 It cannot be easier. Everything is inside clear markdown files. One per chapter.

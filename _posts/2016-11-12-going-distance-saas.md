@@ -12,7 +12,7 @@ summary: "..."
 all difficult moments. As a technical founder, are we too impatient with our
 businesses?
 
-![](https://cdn-images-1.medium.com/max/800/1*HvJsoWMu-eYabs0xquQQiQ.jpeg)
+![Going the distance Rocky](/assets/img/rocky-going-distance.jpeg)
 
 ### From $0 to $XXk MRR
 

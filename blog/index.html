@@ -3,33 +3,37 @@ layout: layout
 title: "Blog"
 ---
 
-<section class="main">
-    <div class="container">
-        <div class="content">
-            <div class="page-heading">All blog posts</div>
-            <ul>
-                {% for post in paginator.posts %}
-                <li class="post-item">
-                    <span class="meta"><time datetime="{{ post.date }}">
-                            {{ post.date | date_to_string }}
-                        </time></span>
+<div class="bg-gray-800 p-12">
+	<div class="mx-auto container">
+		<h1 class="text-white text-6xl">
+			Latest blog posts
+		</h1>
+	</div>
+</div>
 
-                    <a href="{{ post.url }}"><span>{{ post.title }}</span></a>
-                </li>
-                {% endfor %}
-            </ul>
+<div class="mx-auto max-w-xl content py-20">
+	{% for post in paginator.posts %}
+	<p>
+		<span class="text-gray-600 pr-4">
+			<time datetime="{{ post.date }}">
+				{{ post.date | date_to_string }}
+			</time>
+		</span>
+		<a href="{{ post.url }}"><span>{{ post.title }}</span></a>
+	</p>
+	{% endfor %}
 
-            {% if paginator.previous_page %}
-            <a href="{{ paginator.previous_page_path }}">Previous</a>
-            {% else %}
-            <span>Previous</span>
-            {% endif %}
-            <strong>Page: {{ paginator.page }} of {{ paginator.total_pages }}</strong>
-            {% if paginator.next_page %}
-            <a href="{{ paginator.next_page_path }}">Next</a>
-            {% else %}
-            <span>Next</span>
-            {% endif %}
-        </div>
-    </div>
-</section>
+	<div class="pt-8">
+		{% if paginator.previous_page %}
+		<a href="{{ paginator.previous_page_path }}">Previous</a>
+		{% else %}
+		<span>Previous</span>
+		{% endif %}
+		<strong>Page: {{ paginator.page }} of {{ paginator.total_pages }}</strong>
+		{% if paginator.next_page %}
+		<a href="{{ paginator.next_page_path }}">Next</a>
+		{% else %}
+		<span>Next</span>
+		{% endif %}
+	</div>
+</div>

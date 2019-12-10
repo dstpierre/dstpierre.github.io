@@ -8,7 +8,7 @@ comments: false
 summary: "..."
 --- 
 
-![](https://cdn-images-1.medium.com/max/600/1*IXH_QkfEOBbzQE9R6OnU3g.png)
+![Screenshot of a web UI built with TypeScript and Preact](/assets/img/typescript-preact.png)
 
 The last [two](https://www.leadfuze.com/) [startups](https://roadmap.space/)
 I’ve built used [TypeScript](https://www.typescriptlang.org/) and

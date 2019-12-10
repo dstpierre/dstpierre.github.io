@@ -13,7 +13,7 @@ summary: "..."
 working prototype which is not concurrent friendly yet. Your Go program will
 also needs to run on Windows (for now).
 
-![](https://cdn-images-1.medium.com/max/1000/1*dObZ2-MHnfmtUWiqS1vOXA.png)
+![Code sample showing the use of command to call .NET from Go](/assets/img/csharp-from-go.png)
 
 **My situation**: I’m currently doing some consulting at a 25 years old FinTech
 company. While [FinTech](https://en.wikipedia.org/wiki/Financial_technology) is

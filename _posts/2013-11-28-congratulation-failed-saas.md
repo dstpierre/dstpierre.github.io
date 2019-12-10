@@ -12,7 +12,7 @@ summary: "..."
 probably be more easy to confirm. Here’s what I’ve done in the last years in
 terms of SaaS.
 
-![](https://cdn-images-1.medium.com/max/800/1*sZB-CzCsBCcNua7eClF3YQ.png)
+![List of SaaS I built](/assets/img/congrats-saas.png)
 
 Looking at this table it’s almost easy to say:
 
