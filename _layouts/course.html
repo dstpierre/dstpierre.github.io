@@ -82,16 +82,19 @@
 			{{endif}}
 
 			<p class="py-8">
-				{% if page.sales %}
 				<a href="#buy" class="btn">
-					Buy now <span class="line-through px-2">{{page.price}}</span> 
-					{{page.sales}}
-				</a>				
-				{%else%}
-				<a href="#buy" class="btn">
-					Buy now <strong class="px-2">{{page.price}}</strong>
-				</a>				
-				{%endif%}
+					{% if page.buytext %}
+						{{page.buytext}}
+					{% else %}
+						Buy now
+					{% endif %}
+					{% if page.sales %}
+						<span class="line-through px-2">{{page.price}}</span> 
+						{{page.sales}}				
+					{% else %}
+						<strong class="px-2">{{page.price}}</strong>
+				{% endif %}
+				</a>
 			</p>
 		</div>
 	</div>
