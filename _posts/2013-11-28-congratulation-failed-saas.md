@@ -33,7 +33,7 @@ No matter what, I’m now returning to what I always loved and were excited to d
 This is some marketing tasks I’ve done that worked for me and if you did not<br>
 tried them you might want to give them a shot.
 
-**30 minutes 1-on-1 consulting for new customers. **It’s part of having a great
+**30 minutes 1-on-1 consulting for new customers.** It’s part of having a great
 onboarding experiences for your new customers. Having an easy to follow product
 tour or some training are good and you should put efforts to polish those. But
 offering a 1-on-1 30 minutes Skype call to your new customers **WILL **most
@@ -323,8 +323,4 @@ after 1 year like I did with all my products so far. I don’t want that. I’m
 tired of abandoning and I simply want to have fun again doing what I enjoy the
 most in life, developing and owning a software product.
 
-* [SaaS](https://dominicstpierre.com/tagged/saas?source=post)
-* [Startup
-Lessons](https://dominicstpierre.com/tagged/startup-lessons?source=post)
-* [Failure](https://dominicstpierre.com/tagged/failure?source=post)
 

@@ -228,6 +228,4 @@ I felt really good once I wrote my first functions that had nothing to do with
 the Elm architecture process of model, update, view. My only advice is to go
 slowly and don’t get discouraged.
 
-* [Elm](https://dominicstpierre.com/tagged/elm?source=post)
-* [Front End Development](https://dominicstpierre.com/tagged/front-end-development?source=post)
 

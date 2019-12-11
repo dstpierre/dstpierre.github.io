@@ -232,8 +232,4 @@ The source code is available with all pre-order, and the price of the book at
 this time of writing is $17 and increases each time a new chapter is added (+$
 two each chapter).
 
-* [Golang](https://dominicstpierre.com/tagged/golang?source=post)
-* [Database](https://dominicstpierre.com/tagged/database?source=post)
-* [Postgresql](https://dominicstpierre.com/tagged/postgresql?source=post)
-* [Mongodb](https://dominicstpierre.com/tagged/mongodb?source=post)
 

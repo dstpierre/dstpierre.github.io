@@ -90,8 +90,4 @@ of the tools I’m using to gain productivity. Email client is my next target.
 I must admit that a real-time terminal dashboard could be interesting ;).
 Thoughts?
 
-* [Startup](https://dominicstpierre.com/tagged/startup?source=post)
-* [SaaS](https://dominicstpierre.com/tagged/saas?source=post)
-* [Stripe](https://dominicstpierre.com/tagged/stripe?source=post)
-* [Terminal](https://dominicstpierre.com/tagged/terminal?source=post)
 

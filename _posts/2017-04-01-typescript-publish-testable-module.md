@@ -347,8 +347,4 @@ a big thing for me.
 
 > Make sure to click the like button if you have appreciated this tutorial.
 
-* [JavaScript](https://dominicstpierre.com/tagged/javascript?source=post)
-* [Typescript](https://dominicstpierre.com/tagged/typescript?source=post)
-* [NPM](https://dominicstpierre.com/tagged/npm?source=post)
-* [React](https://dominicstpierre.com/tagged/react?source=post)
 

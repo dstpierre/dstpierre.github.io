@@ -272,7 +272,4 @@ Even though I’m feeling good when writing Go code (back end), I’m feeling go
 when I know that the front-end is as lightweight and as easy as possible for new
 devs to get started. Preact is a marvelous option, check it out.
 
-* [Typescript](https://dominicstpierre.com/tagged/typescript?source=post)
-* [Preact](https://dominicstpierre.com/tagged/preact?source=post)
-* [JavaScript](https://dominicstpierre.com/tagged/javascript?source=post)
 

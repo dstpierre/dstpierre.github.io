@@ -133,8 +133,4 @@ What do you think? Is it worth continuing or the amount of code required is too
 considerable, I’m mostly thinking for cases where the C# function accept classes
 instead of primitive data types.
 
-* [Programming](https://dominicstpierre.com/tagged/programming?source=post)
-* [Golang](https://dominicstpierre.com/tagged/golang?source=post)
-* [Csharp](https://dominicstpierre.com/tagged/csharp?source=post)
-* [Dotnet](https://dominicstpierre.com/tagged/dotnet?source=post)
 

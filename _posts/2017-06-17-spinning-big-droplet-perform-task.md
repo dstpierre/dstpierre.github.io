@@ -121,8 +121,4 @@ can continue focusing on other things.
 It kind of reminds me how in 1999 we were treating Microsoft SQL Server 7
 performance issue by just adding more and more RAM to the server :).
 
-* [Golang](https://dominicstpierre.com/tagged/golang?source=post)
-* [Digitalocean](https://dominicstpierre.com/tagged/digitalocean?source=post)
-* [Deployment](https://dominicstpierre.com/tagged/deployment?source=post)
-* [API](https://dominicstpierre.com/tagged/api?source=post)
 

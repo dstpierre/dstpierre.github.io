@@ -115,8 +115,3 @@ Deciding to postpone a goal is not the same as abandoning it.
 I’m now determined to go the 15 rounds and accept that my path will be
 different, are you?
 
-* [Startup](https://dominicstpierre.com/tagged/startup?source=post)
-* [SaaS](https://dominicstpierre.com/tagged/saas?source=post)
-* [Goal Setting](https://dominicstpierre.com/tagged/goal-setting?source=post)
-* [Babies](https://dominicstpierre.com/tagged/baby?source=post)
-

@@ -184,8 +184,4 @@ but are not sure if you should or think you cannot do it, I’d say **just try**
 I’m a non-native English speaker without an audience, and I did it. It’s hard
 but doable.
 
-* [Writing](https://dominicstpierre.com/tagged/writing?source=post)
-* [Golang](https://dominicstpierre.com/tagged/golang?source=post)
-* [Books](https://dominicstpierre.com/tagged/books?source=post)
-* [Pandoc](https://dominicstpierre.com/tagged/pandoc?source=post)
 

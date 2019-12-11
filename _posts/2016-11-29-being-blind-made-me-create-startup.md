@@ -179,10 +179,4 @@ You can learn more about this disease and research efforts
 [here](http://www.blindness.org/retinitis-pigmentosa). In the meantime, I’ll be
 spending my time wisely with my family and building something people love.
 
-* [Startup](https://dominicstpierre.com/tagged/startup?source=post)
-* [Entrepreneurship](https://dominicstpierre.com/tagged/entrepreneurship?source=post)
-* [Product
-Management](https://dominicstpierre.com/tagged/product-management?source=post)
-* [Inspiration](https://dominicstpierre.com/tagged/inspiration?source=post)
-* [Blindness](https://dominicstpierre.com/tagged/blindness?source=post)
 
