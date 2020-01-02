@@ -63,6 +63,25 @@
 	<link href="/assets/css/tailwind.css" rel="stylesheet" />
 	<link href="/assets/css/pygments.css" rel="stylesheet" />
 
+	<style>
+		.video-container {
+			position: relative;
+			padding-bottom: 56.25%;
+			padding-top: 30px;
+			height: 0;
+			overflow: hidden;
+		}
+
+		.video-container iframe,
+		.video-container object,
+		.video-container embed {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
 
 </head>
 
@@ -84,23 +103,29 @@
 			<p class="py-8">
 				<a href="#buy" class="btn">
 					{% if page.buytext %}
-						{{page.buytext}}
+					{{page.buytext}}
 					{% else %}
-						Buy now
+					Buy now
 					{% endif %}
 					{% if page.sales %}
-						<span class="line-through px-2">{{page.price}}</span> 
-						{{page.sales}}				
+					<span class="line-through px-2">{{page.price}}</span>
+					{{page.sales}}
 					{% else %}
-						<strong class="px-2">{{page.price}}</strong>
-				{% endif %}
+					<strong class="px-2">{{page.price}}</strong>
+					{% endif %}
 				</a>
 			</p>
+			{% if page.video %}
+			<div class="py-8 video-container">
+				<iframe width="1280" height="720" src="{{page.video}}" frameborder="0"
+					allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			</div>
+			{% endif %}
 		</div>
 	</div>
 
 	<div class="mx-auto container py-20 content">
-		{{ content }}	
+		{{ content }}
 	</div>
 
 	{% include footer.html %}
