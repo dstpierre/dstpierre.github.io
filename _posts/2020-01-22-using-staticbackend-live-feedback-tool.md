@@ -240,3 +240,102 @@ update msg model =
 
 
 I'm now going out doing some skating with the kids, will be back after lunch.
+
+### 13:52: After a long skating/lunch break, attacking the Feedback
+
+Side note, this year I decided to lower my consulting days to three per week to 
+have time to work on my product(s) and be with my two daughters as much as 
+possible before they go to school next September. We are homeschooling them 
+for the last 10 years.
+
+![went skating to take some fresh air](/assets/img/clearuser-live-skating.jpeg)
+
+I've started the `Feedback` layout. I'm usually writing the `model` first when 
+using Elm. This is what I have so far for the `Feedback` model:
+
+```elm
+type Filter
+    = Trending
+    | Top
+    | New
+
+type Status
+    = All
+    | New
+    | Pending
+    | UnderReview
+    | Planned
+    | Completed
+    | Rejected
+
+type alias Feedback =
+    { id : String
+    , accountId : String
+    , title : String
+    , desc : String
+    , likes : Int
+    , owner : User
+    , users : List User
+    , comments : List C.Comment
+    , pinnedReply : Maybe C.Comment
+    , status : Status
+    , postedAt : Iso8601.decoder
+    }
+```
+
+Currently writing the JSON encoders/decoders for all those model, here's a 
+piece of code:
+
+```elm
+decoder : Decoder Feedback
+decoder =
+    Decode.succeed Feedback
+        |> required "id" Decode.string
+        |> required "accountId" Decode.string
+        |> required "title" Decode.string
+        |> required "desc" Decode.string
+        |> required "likes" Decode.int
+        |> required "owner" U.decoder
+        |> required "users" (Decode.list U.decoder)
+        |> required "comments" (Decode.list C.decoder)
+        |> optional "pinnedReply" C.decoder Nothin
+        |> required "status" statusDecoder
+        |> required "postedAt" Iso8601.decoder
+```
+
+I'm starting to think that I will change the API of StaticBackend's database 
+a little bit.
+
+That was also the goal of creating this little real-world project, to make sure 
+StaticBackend can handle lots of scenarios and stay flexible yet simple.
+
+I need to have a way to have the feedback viewable by multiple users. The way 
+I designed StaticBackend was that a users could only view their own data.
+
+To handle this scenario I'm introducing collection prefixed with 
+`pub_` which will required to have a valid authentication token, but will not 
+limit to only the current user's data. In the case where mutliple users need to 
+view the data, this is useful.
+
+Next up is starting to have some view rendered, for instance, my `Main` module 
+have this as `model`:
+
+```elm
+type Layout
+    = Loading
+    | Failed String
+    | Feedback
+    | Changelog
+    | Roadmap
+    | NewPost
+
+
+type alias Model =
+    { user : U.User
+    , token : String
+    , layout : Layout
+    }
+```
+
+I'll be using that `Layout` type to control what is displayed in the main 
+view. More on that on my next update.
