@@ -339,3 +339,49 @@ type alias Model =
 
 I'll be using that `Layout` type to control what is displayed in the main 
 view. More on that on my next update.
+
+### 17:52: What a crazy day
+
+It has been a long time that I did not had a productive day like today.
+
+I did not reached my goal of having the first view rendered. But I'm extremely 
+satisfied of where the project is at. I was kind of stock for the Feedback 
+query.
+
+To let users select if they want to sort by Trending, Top or New and filter by 
+status like Under Review, Planned.
+
+Here's the piece of code without the type definitions:
+
+```elm
+list : String -> Filter -> Status -> (Result Http.Error (List Feedback) -> msg) -> Cmd msg
+list tok filter status msg =
+    let
+        sortBy =
+            case filter of
+                Trending ->
+                    "trendingLikes"
+
+                Top ->
+                    "likes"
+
+                Latest ->
+                    ""
+
+        body =
+            if status /= All then
+                Encode.list queryEncode
+                    [ ValueString "status", ValueString "=", ValueString (statusToString status) ]
+
+            else
+                Encode.list queryEncode
+                    [ ValueString "status", ValueString "!=", ValueString (statusToString New) ]
+    in
+    post
+        tok
+        (Endpoints.query "pub_feedback" sortBy)
+        (Http.jsonBody body)
+        (Http.expectJson msg (Decode.list decoder))
+```
+
+Project is compiling for now. I can't wait to continue on this tomorrow morning.
