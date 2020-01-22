@@ -122,3 +122,121 @@ But now taking a small break for breakfast and talk with my daughters and wife.
 
 When I'm back, I'll attack the user management (register and login) and the 
 initial views.
+
+
+### 10:07: User login/register completed
+
+I've used a `User` module in Elm and added two functions for `login` and 
+`register`:
+
+```elm
+login : ( String, String ) -> (Result Http.Error String -> msg) -> Cmd msg
+login ( email, pin ) msg =
+    post
+        ""
+        Endpoints.login
+        (Http.jsonBody
+            (Encode.object
+                [ ( "email", Encode.string email )
+                , ( "password", Encode.string pin )
+                ]
+            )
+        )
+        (Http.expectJson msg Decode.string)
+
+
+register : ( String, String ) -> (Result Http.Error String -> msg) -> Cmd msg
+register ( email, pin ) msg =
+    post
+        ""
+        Endpoints.register
+        (Http.jsonBody
+            (Encode.object
+                [ ( "email", Encode.string email )
+                , ( "password", Encode.string pin )
+                ]
+            )
+        )
+        (Http.expectJson msg Decode.string)
+```
+
+The are HTTP requests sending the following JSON:
+
+```json
+{
+	"email": "current_user@email.com",
+	"password": "current_user_pin_from_host"
+}
+```
+
+They both receive a `string` which is the authentication token. This `token` 
+will be used for all authenticated calls to the API:
+
+```elm
+credHeader : String -> List Http.Header
+credHeader tok =
+    [ Http.header "Authorization" ("Bearer " ++ tok)
+    , Http.header "SB-PUBLIC-KEY" "5e285f6bfe98b7b19450baad"
+    ]
+```
+
+The host app will pass the necessary information and Elm will initialized 
+the app receiving the info as `flags`.
+
+```elm
+init : Decode.Value -> ( Model, Cmd Msg )
+init flags =
+    case Decode.decodeValue U.decoder flags of
+        Ok usr ->
+            let
+                u =
+                    { usr | isAdmin = False }
+            in
+            ( { user = u
+              , token = ""
+              }
+            , U.login ( u.email, u.pin ) GotLogin
+            )
+
+        Err _ ->
+            ( { user = U.User "" "" "" False
+              , token = ""
+              }
+            , Cmd.none
+            )
+```
+
+We're calling a `login` when the Elm application initialize.
+
+From there we can have our starting point `update` function:
+
+```elm
+type Msg
+    = GotLogin (Result Http.Error String)
+    | GotRegister (Result Http.Error String)
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        GotLogin res ->
+            case res of
+                Ok tok ->
+                    ( { model | token = tok }, Cmd.none )
+
+                Err _ ->
+                    ( model
+                    , U.register ( model.user.email, model.user.pin ) GotRegister
+                    )
+
+        GotRegister res ->
+            case res of
+                Ok tok ->
+                    ( { model | token = tok }, Cmd.none )
+
+                Err err ->
+                    ( model, Cmd.none )
+```
+
+
+I'm now going out doing some skating with the kids, will be back after lunch.
