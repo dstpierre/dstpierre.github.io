@@ -34,6 +34,22 @@ div.content p {
 	@apply text-xl text-gray-700 py-4;
 }
 
+div.content ul {
+	@apply list-disc pl-8;
+}
+
+div.content ol {
+	@apply list-decimal pl-8;
+}
+
+div.content li {
+	@apply pb-2;
+}
+
+div.content pre {
+	@apply overflow-x-scroll;
+}
+
 
 .stylistic-quote-mark {
   font-size: 5rem;
