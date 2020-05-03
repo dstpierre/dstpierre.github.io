@@ -122,6 +122,8 @@ It's just a quick list that can get you very far, depending on what you're
 looking to build. What I'm trying to convey here is that Go is probably the 
 most straightforward language available at the moment.
 
+{% include push-content.html %}
+
 ### It's OK to not have sub-packages at first
 
 Don't stress about having great packages on your first 2-3 projects. Here's 
