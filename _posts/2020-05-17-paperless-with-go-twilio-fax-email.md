@@ -348,6 +348,8 @@ $> make deploy
 
 ## Add QR-Code to your document
 
+{% include push-content.html %}
+
 Now it's time to add those QR-Code to the document you send, so when they get 
 back, they can be automatically dispatched to the right employee or the right 
 place in your system.
