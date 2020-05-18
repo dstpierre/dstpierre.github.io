@@ -528,11 +528,11 @@ Twilio's cost is higher since it's based on volume. Here are some aspects that
 differ from paperless compared to the printed faxes:
 
 * Locally there were eight fax lines. There's one Twilio number.
-* Locally they were printing all the documents. No, nothing is printed. This 
+* Locally they were printing all the documents. Now, nothing is printed. This 
 is a significant environmental gain I'd say and a cost-saving for printers and 
 paper.
 * Locally they were manually handling the dispatch of the document. With the 
-QR-Code, it's not automated.
+QR-Code, it's automated.
 * Locally there was still some small maintenance, although fax machine tends to 
 be plug and forget kind of devices. But the printers. Now there's nothing to 
 maintain in terms of physical devices. On the other hand, there's more code 
