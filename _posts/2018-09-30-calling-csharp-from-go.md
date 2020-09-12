@@ -55,11 +55,11 @@ you need to expose to Go. Using the standard in and standard out, it is possible
 to call native, not DotNet-Core, but DotNet 4.5 methods from Go and get the
 value returned by the method.
 
-> Shameless plug: Please check out my book on building Go web applications / SaaS.
-
 This is all the code for the prototype, I’ll talk about it after:
 
 Lets start with `Program.cs`
+
+<script src="https://gist.github.com/dstpierre/8eec3061ace69716f0ddb01dfd4d8bef.js"></script>
 
 This is a C# .NET console application that continuously read the standard input
 for method to execute. The communication between Go and C# uses JSON and Go
