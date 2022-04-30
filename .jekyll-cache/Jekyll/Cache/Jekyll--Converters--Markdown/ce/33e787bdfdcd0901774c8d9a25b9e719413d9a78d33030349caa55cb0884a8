@@ -1,0 +1,24 @@
+I"y<p>LCSK is a small and lightweight <strong>free and open source</strong> live chat / live support 
+application. It uses <a href="http://www.asp.net/signalr">Microsoft SignalR</a> for communication mechanism. 
+No database involved, only a single folder and the SignalR dependencies are added to your project.</p>
+
+<p>This is an updated video on how to add my open source project 
+<a href="https://github.com/dstpierre/lcsk">LiveChat Starter Kit</a> to your ASP.NET project.</p>
+
+<iframe width="960" height="540" src="//www.youtube.com/embed/DjaO4R1knJE?rel=0" frameborder="0"></iframe>
+
+<h2 id="steps-for-adding-lcsk-to-your-aspnet-project">Steps for adding LCSK to your ASP.NET project</h2>
+
+<ol>
+  <li>From a Package Management Console type: <code class="highlighter-rouge">Install-Package LCSK</code>.</li>
+  <li>Copy the 3 JavaScript lines wherever you want the chat box to appear.</li>
+  <li>Start your app and navigate to: <strong>/lcsk/install.html</strong>.</li>
+  <li>Set the password for the admin and agent role.</li>
+  <li>Go to: <strong>/lcsk/agent.html</strong> and sign-in with any name and the agent password.</li>
+</ol>
+
+<p>From there you’re up to go, you can simulate a visitor with another browser and request a chat 
+by typing into the chat box.</p>
+
+<p>Get more documentation and the complete source from <a href="https://github.com/dstpierre/lcsk">LCSK’s github page</a>.</p>
+:ET

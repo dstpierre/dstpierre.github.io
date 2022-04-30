@@ -1,21 +1,63 @@
-name: Dominic St-Pierre
-description: Dominic St-Pierre's Blog
-timezone: America/Montreal
-permalink: /:title.html
-url: https://dominicstpierre.com
-safe: true
-author: Dominic St-Pierre
-email: dominicstpierre@gmail.com
-highlighter: rouge
-paginate: 20
-paginate_path: "/blog/:num/"
+# Site settings
+title_left    : "Dominic"
+title_right   : "St-Pierre" # default: ""
+description   : "Blog about software engineering and long-live systems."
+keywords      : "go, golang, programming, software, developer"
+url           : https://dominicstpierre.com # site url
+baseurl       : "" # apply repo name like "/myproject" if used under gh-pages branch, else (under master branch) just leave empty/blank
+cover         : "" # image uri like logo/cover image for site seo
+
+#google_analytics  : UA-XXXXX-XX
+twitter_username  : "dominicstpierre"
+comments_enabled  : false # if enabled (set to true), please provide your disqus_username
+disqus_shortname  : ""
+postshare_enabled : false
+
+# Build settings
+permalink   : /:title
+markdown    : kramdown
+highlighter : rouge
+
+source      : ./
+destination : ./_site
+
+# Sass configuration
+sass:
+  sass_dir  : assets/scss
+  style     : compressed # expanded
+
+# Author settings
+author:
+  name     : "John Doe"
 
 plugins:
-  - jekyll-redirect-from
-
-gems:
-  - jekyll-github-metadata
-  - jekyll-mentions
-  - jekyll-redirect-from
   - jekyll-sitemap
-  - jemoji
+  - bourbon
+  - jekyll-paginate
+
+# navbar pages
+navbar:
+  - slug : about
+    title: About
+  - slug : blog
+    title: Blog
+
+exclude:
+  - "gulp"
+  - "node_modules"
+  - "bower"
+  - "bower_components"
+  - "config.rb"
+  - "src"
+  - "Gemfile"
+  - "Gemfile.lock"
+  - ".rvmrc"
+  - ".rbenv-version"
+  - "package.json"
+  - "gulpfile.js"
+  - "README.md"
+  - "Rakefile"
+  - "changelog.md"
+  - "script"
+  - "vendor"
+  - "thinkspace.gemspec"

@@ -1,49 +1,10 @@
-<div class="mx-auto">
-	<nav class="flex items-center justify-between flex-wrap p-6">
-		<div class="flex items-center flex-shrink-0 text-gray-800 mr-6">
-			<a href="/" title="Dominic St-Pierre home">
-				<img class="fill-current mr-2 h-16" src="/assets/img/me.jpg" />
-			</a>
 
-		</div>
-		<div class="block lg:hidden">
-			<button
-				class="flex items-center px-3 py-2 border rounded text-gray-200 border-gray-400 hover:text-white hover:border-white">
-				<svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-					<title>Menu</title>
-					<path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-				</svg>
-			</button>
-		</div>
-		<div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
-			<div class="text-base text-bold lg:flex-grow">
-				<a href="/books" class="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-gray-900 mr-4"
-					title="Books">
-					Books
-				</a>
-				<a href="/videos" class="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-gray-900 mr-4"
-					title="Videos">
-					Videos
-				</a>
-				<a href="/cto-as-a-service" class="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-gray-900 mr-4"
-					title="CTO as a service">
-					CTO as a service
-				</a>
-				<a href="/blog" class="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-gray-900 mr-4"
-					title="Blog">
-					Blog
-				</a>
-				<a href="/about" class="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-gray-900"
-					title="About">
-					About
-				</a>
-			</div>
-			<div>
-				<a href="https://store.dominicstpierre.com/login"
-					class="inline-block text-base px-4 py-2 leading-none border rounded text-gray-800 border-gray-900 hover:border-transparent hover:text-gray-900 hover:bg-white mt-4 lg:mt-0">
-					Access your content
-				</a>
-			</div>
-		</div>
-	</nav>
-</div>
+<nav class="nav">
+  <div class="container">
+    <h1 class="logo"><a href="{{ '/' | prepend: site.baseurl | prepend: site.url }}">{{ site.title_left }}<span>{{ site.title_right }}</span></a></h1>
+    <ul class="navbar">
+      <li><a href="{{ '/about' | prepend: site.baseurl | prepend: site.url }}">About me</a></li>
+      <li><a href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}" target="_blank">RSS</a></li>
+    </ul>
+  </div>
+</nav>

@@ -1,0 +1,59 @@
+I"a<p>I’ve been really excited with the new Windows Azure Websites recently. As a
+long time <a href="http://www.appharbor.com">AppHarbor</a> user, deploying ASP.NET MVC
+app to the cloud via a git push is extremely nice.</p>
+
+<p>Something strange happened to me on my last project though. After creating a
+basic working prototype of the app I was ready to deploy the application.
+Since it’s a small prototype for now I was using the Visual Studio Publishing
+Wizard.</p>
+
+<p>I had enable migrations on the project, created some models and my
+<a href="http://msdn.microsoft.com/en-
+us/library/system.data.entity.dbcontext(v=vs.103).aspx">DbContext</a> class, everything was
+working nicely. On the Publishing Wizard I was seeing this:</p>
+
+<p><img src="/images/without-code-first.png" alt="without-code-first" title="Publishing Wizzard without code first" /></p>
+
+<p>The <strong>Enable Code First Migrations</strong> check box was not present, and my
+DbContext class was not displayed. The wizard should look like this:</p>
+
+<p><img src="/images/with-code-first.png" alt="with-code-first" title="Publishing Wizzard with code first" /></p>
+
+<p>After a couple of time (hours?) of digging, I finally find where the thing is
+configured.</p>
+
+<p><img src="/images/publish-settings.png" alt="publish-settings" title="Publishing settings" /></p>
+
+<h3 id="manually-editing-the-pubxml-file-to-make-the-check-box-appear">Manually editing the pubxml file to make the check box appear</h3>
+
+<p>You can enable that check box by editing the Properties\YourProject -
+WebDeploy.pubxml look for the PublishDatabaseSettings</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nt">&lt;PublishDatabaseSettings&gt;</span>  
+      <span class="nt">&lt;Objects</span> <span class="na">xmlns=</span><span class="s">""</span><span class="nt">&gt;</span>  
+        <span class="nt">&lt;ObjectGroup</span> <span class="na">Name=</span><span class="s">"Namespace.Models.YourDBClass"</span> <span class="na">Order=</span><span class="s">"1"</span> <span class="na">Enabled=</span><span class="s">"True"</span><span class="nt">&gt;</span>  
+          <span class="nt">&lt;Destination</span> <span class="na">Path=</span><span class="s">"your-connection-string-goes-here"</span> <span class="nt">/&gt;</span>  
+          <span class="nt">&lt;Object</span> <span class="na">Type=</span><span class="s">"DbCodeFirst"</span><span class="nt">&gt;</span>  
+            <span class="nt">&lt;Source</span> <span class="na">Path=</span><span class="s">"DBMigration"</span> <span class="na">DbContext=</span><span class="s">"Namespace.Models.YourDBClass, AssamblyName"</span> <span class="na">MigrationConfiguration=</span><span class="s">"Namespace.Migrations.Configuration, Assambly"</span> <span class="na">Origin=</span><span class="s">"Convention"</span> <span class="nt">/&gt;</span>  
+          <span class="nt">&lt;/Object&gt;</span>  
+        <span class="nt">&lt;/ObjectGroup&gt;</span>  
+      <span class="nt">&lt;/Objects&gt;</span>  
+    <span class="nt">&lt;/PublishDatabaseSettings&gt;</span>
+</code></pre></div></div>
+
+<p>Change Namespace.Models.YourDBClass by your class that inherits DbContext,
+change Namespace.Migratins.Configuration to fit your migration configuration
+namespace and Assambly with your Assambly name.</p>
+
+<p>Save and open the publish wizard you will have that check box.</p>
+
+<p>I’ve took the VS Publishing Wizard from <a href="http://stackoverflow.com/questions/13230902/publishing-my-database-
+package-deploy-with-code-first-migrations/13388315#13388315">that stackoverflow
+question</a> I’ve answered.</p>
+
+<p>Technorati Tags: <a href="http://technorati.com/tags/Windows+Azure">Windows
+Azure</a>,<a href="http://technorati.com/tags/Publishing+Wizard">Publishing
+Wizard</a>,<a href="http://technorati.com/tags/EF+Code+First+Migrations">EF Code First
+Migrations</a></p>
+
+:ET

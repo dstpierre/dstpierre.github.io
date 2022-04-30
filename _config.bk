@@ -1,0 +1,21 @@
+name: Dominic St-Pierre
+description: Dominic St-Pierre's Blog
+timezone: America/Montreal
+permalink: /:title.html
+url: https://dominicstpierre.com
+safe: true
+author: Dominic St-Pierre
+email: dominicstpierre@gmail.com
+highlighter: rouge
+paginate: 20
+paginate_path: "/blog/:num/"
+
+plugins:
+  - jekyll-redirect-from
+
+gems:
+  - jekyll-github-metadata
+  - jekyll-mentions
+  - jekyll-redirect-from
+  - jekyll-sitemap
+  - jemoji

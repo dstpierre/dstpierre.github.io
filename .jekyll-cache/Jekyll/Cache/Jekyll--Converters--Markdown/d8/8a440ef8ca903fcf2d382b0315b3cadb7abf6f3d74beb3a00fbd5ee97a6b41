@@ -1,0 +1,86 @@
+I"�<p><img src="/images/go-azure-deployment.png" alt="Go editing with atom" title="Go editing with atom" /></p>
+
+<p>You know when you do something by habits and don’t really have time to see if there’s a better way to do it?</p>
+
+<p>That’s exactly what I was doing regarding my Go deployment to my Azure Web Apps.</p>
+
+<h3 id="manual-deployment">Manual deployment</h3>
+
+<p>Here were my flow for deploying a Go program to Azure Web Apps.</p>
+
+<ol>
+  <li>Development</li>
+  <li>Git push to Github</li>
+  <li><code class="highlighter-rouge">go test</code> and <code class="highlighter-rouge">go build</code></li>
+  <li>I had a web.config that specified that I was deploying an httpPlateformHandler app.</li>
+  <li>Was incrementing the exe’s filename =&gt; v-0.0.1, v-0.0.2</li>
+  <li>Was FTPing to Azure Web Apps and sending the new exe with web.config updated app</li>
+</ol>
+
+<p>The last steps was automatically picking the new exe as the new app to handle requests.</p>
+
+<p>Here’s the web.config that I had.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+  <span class="nt">&lt;system.web&gt;</span>
+        <span class="nt">&lt;customErrors</span> <span class="na">mode=</span><span class="s">"Off"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/system.web&gt;</span>
+    <span class="nt">&lt;system.webServer&gt;</span>
+        <span class="nt">&lt;handlers&gt;</span>
+            <span class="nt">&lt;add</span> <span class="na">name=</span><span class="s">"httpplatformhandler"</span> <span class="na">path=</span><span class="s">"*"</span> <span class="na">verb=</span><span class="s">"*"</span> <span class="na">modules=</span><span class="s">"httpPlatformHandler"</span> <span class="na">resourceType=</span><span class="s">"Unspecified"</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/handlers&gt;</span>
+        <span class="nt">&lt;httpPlatform</span> <span class="na">stdoutLogEnabled=</span><span class="s">"true"</span> <span class="na">processPath=</span><span class="s">"d:\home\site\wwwroot\v-0.0.10.exe"</span>
+                      <span class="na">arguments=</span><span class="s">""</span>
+                      <span class="na">startupTimeLimit=</span><span class="s">"60"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;environmentVariables&gt;</span>
+              <span class="nt">&lt;environmentVariable</span> <span class="na">name=</span><span class="s">"GOROOT"</span> <span class="na">value=</span><span class="s">"d:\home\site\wwwroot\go"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;/environmentVariables&gt;</span>
+        <span class="nt">&lt;/httpPlatform&gt;</span>
+    <span class="nt">&lt;/system.webServer&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div></div>
+
+<p>Although this was taking me like 45-60 seconds of manual commands, it was fairly quick to have a new version in production.</p>
+
+<h3 id="then-i-needed-to-implement-websocket">Then I needed to implement websocket</h3>
+
+<p>I’m currently porting some Node apps and I needed to have websocket handler. On Node when you want to enable websocket you need to eneable it on the Azure portal, and you need to add this to your <code class="highlighter-rouge">web.config</code>:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;webSocket</span> <span class="na">enabled=</span><span class="s">"false"</span> <span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<p>So I try that and deployed my Go app, was not working, I tried to removed it and it was not working as well.</p>
+
+<p>Long story short, I exhausted all my idea and start fearing that Azure websocket and Go app were not going to play nicely. Than I posted a <a href="http://stackoverflow.com/questions/33675348/azure-websocket-not-working-with-go-httpplatformhandler/33684891#33684891">StackOverflow question</a>.</p>
+
+<p><strong>Xiaomin Wu</strong> replied and I was shocked to see on his Github repo the presence of the Azure button “Deploy to Azure” and he also mentioned that he did not created any <code class="highlighter-rouge">web.config</code>.</p>
+
+<blockquote>
+  <p>What? Can we just <code class="highlighter-rouge">git push</code> to Azure for Go app now?</p>
+</blockquote>
+
+<h3 id="deploying-go-app-on-azure-is-now-as-easy-as-a-c-or-node-app">Deploying Go app on Azure is now as easy as a C# or Node app</h3>
+
+<p>I than plugged my Azure Web App to my Github repository and tried to deploy. <strong>It worked</strong>.</p>
+
+<p>This is a major improvement in the flow of deploying changes to production.</p>
+
+<p>I compared the <code class="highlighter-rouge">web.config</code> that is automatically created by Kudu with mine and there’s not much difference. Still don’t really understand why my manual deployment did not work with websocket, but I’m just glad we can now deploy Go apps to Azure from a <code class="highlighter-rouge">git push</code>.</p>
+
+<p><strong>Flow is now</strong>:</p>
+
+<ol>
+  <li>Developement</li>
+  <li><code class="highlighter-rouge">go test</code></li>
+  <li><code class="highlighter-rouge">git push</code></li>
+</ol>
+
+<h3 id="been-loving-go-so-far">Been loving Go so far</h3>
+
+<p>This past year was super exciting for me in terms of technologies that I had the chance to discover and work  with. Go is the most recent for me in production and so far I like it very much.</p>
+
+<p>The learning curve is steep, especially from someone like me that’s coming from a ~15 year C# background.</p>
+
+<p>But I think it is making me become a better programmer, and it has been a long time since I felt this from a language.</p>
+:ET

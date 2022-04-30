@@ -1,20 +1,16 @@
 ---
-layout: layout
+layout: default
 ---
 
-<div class="bg-gray-800 p-12">
-	<div class="mx-auto container">
-		<h1 class="text-white text-6xl">
-			{{ page.title }}
-		</h1>
-		<p class="text-gray-300" title="{{ page.date }}">
-			{{ page.date | date_to_string }}
-		</p>
-	</div>
-</div>
+<article class="post container" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <p class="post-meta"><time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%b %-d, %Y" }}</time>{% if page.author %} &middot; <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page.author }}</span></span>{% endif %}</p>
+    <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    {{ content }}
+    {% include post-share.html %}
+  </div>
+</article>
 
-<div class="mx-auto container py-20 max-w-xl content">
-	{{ content }}	
-
-	<p class="pt-8"><a href="/blog">Back to posts</a></p>
-</div>
+{% include comments.html %}

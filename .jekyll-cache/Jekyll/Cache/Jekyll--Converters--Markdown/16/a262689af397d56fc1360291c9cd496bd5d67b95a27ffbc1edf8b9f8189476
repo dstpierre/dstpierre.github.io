@@ -1,0 +1,488 @@
+I"8<p><strong>Major update: I’ve removed jQuery and now I’m at 101 lines of vanilla Javascript.</strong></p>
+
+<blockquote>
+  <p>I’ve posted this on Reddit Javascript and Wince made me realize that by having
+jQuery as dependency, the 172 lines of code was not a fact, since jQuery have
+10k LoC.</p>
+</blockquote>
+
+<blockquote>
+  <p>So I’ve took the challenge and rewrite the RSS reader by removing the jQuery
+reference and rewriting lots of the DOM, events code that I had for jQuery.
+And I’m now at 101 lines of JavaScript code, a save of 42 %, it’s crazy.</p>
+</blockquote>
+
+<blockquote>
+  <p>I’m leaving the article as it were at first, and I’m posting the entire
+JavaScript code in the bottom. The code at GitHub is updated as well.</p>
+</blockquote>
+
+<p>Like many others, I find myself “RSS reader-less” when Google decided to <a href="http://googlereader.blogspot.ca/2013/03/powering-down-google-
+reader.html">shut
+down Reader</a>. Yes, I’ve tried a couple of alternatives, but nothing was really
+appealing to me. When I woke up this morning I had a thought, would that be
+that long to write a one page HTML / JavaScript RSS reader?</p>
+
+<p>It turns out to be pretty quick and easy, thanks to the <a href="https://developers.google.com/feed/">Google Feed
+API</a> which allow you to get a nice JSON
+object from an RSS feed.</p>
+
+<p><img src="/images/connectica.png" alt="connectica" title="Connectica screenshot" /></p>
+
+<h2 id="no-non-sense-amount-of-files">No non-sense amount of files</h2>
+
+<p>This is the first project I’m starting since the sale of my last SaaS. I
+wanted something quick. I was using <a href="https://www.goread.io/">goread.io</a>
+recently as my Google Reader replacement and I thought, what do I really need
+when reading my news?</p>
+
+<ol>
+  <li>I need to see the last post for blog I follow</li>
+  <li>I need to be able to read the post and keep track of which I’ve read</li>
+  <li>I need to be able to add and remove blog feed</li>
+</ol>
+
+<p>I felt like I was missing posts from my favorite “crew” recently and since I
+like to be on the edge as much as possible I had to do something to make sure
+I got those articles in front of me.</p>
+
+<p>Let’s open Visual Studio and start a new HTML page where everything will be
+there to consume RSS feeds.</p>
+
+<h2 id="the-magic-piece-of-code">The magic piece of code</h2>
+
+<p><em>this is the original code using jQuery</em></p>
+
+<p>Here’s the most important JavaScript function:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">function</span> <span class="nx">parseRSS</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>  
+      <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>  
+          <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">https://ajax.googleapis.com/ajax/services/feed/load?v=1.0&amp;num=10&amp;callback=?&amp;q=</span><span class="dl">'</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">url</span><span class="p">),</span>  
+          <span class="na">dataType</span><span class="p">:</span> <span class="dl">'</span><span class="s1">json</span><span class="dl">'</span><span class="p">,</span>  
+        <span class="na">success</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>  
+          <span class="nx">callback</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">responseData</span><span class="p">.</span><span class="nx">feed</span><span class="p">);</span>  
+        <span class="p">}</span>  
+      <span class="p">});</span>  
+    <span class="p">}</span>
+</code></pre></div></div>
+<p>Easy enough. This API convert an RSS feed to JSON.</p>
+
+<h3 id="using-localstorage-and-sessionstorage">Using localStorage and sessionStorage</h3>
+
+<p>I’m using a simple JSON object { name, url } to hold all feeds that have been
+added in the localStorage.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">function</span> <span class="nx">loadFeeds</span><span class="p">()</span> <span class="p">{</span>  
+      <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#feed-list</span><span class="dl">'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="dl">''</span><span class="p">);</span>  
+      <span class="kd">var</span> <span class="nx">feeds</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">feeds</span><span class="dl">'</span><span class="p">));</span>  
+      <span class="k">if</span> <span class="p">(</span><span class="nx">feeds</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feeds</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="nx">feeds</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="nx">addFeed</span><span class="p">();</span>  
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  
+        <span class="nx">feeds</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>  
+          <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#feed-list</span><span class="dl">'</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span>  
+            <span class="dl">'</span><span class="s1">&lt;span class="feed" data-url="</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">url</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">"&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+            <span class="dl">'</span><span class="s1">  &lt;a href="#" class="switch-feed"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/a&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+            <span class="dl">'</span><span class="s1">  &lt;a href="#" class="delete-feed"&gt;X&lt;/a&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+            <span class="dl">'</span><span class="s1">&lt;/span&gt;</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="p">});</span>  
+      <span class="p">}</span>  
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>I know, why are you not using any template mechanism. This thing took me in
+all 1.5 hours to write, add to GitHub and deploy to Azure.</p>
+</blockquote>
+
+<p>I’m simply iterating on all saved feed and displaying a link to load the
+latest posts. When we click on a feed the idea is to check if the posts were
+already loaded into the sessionStorage and display it.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">body</span><span class="dl">'</span><span class="p">).</span><span class="nx">on</span><span class="p">({</span>  
+      <span class="na">click</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>  
+        <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">data</span><span class="p">(</span><span class="dl">'</span><span class="s1">url</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>  
+        <span class="k">if</span><span class="p">(</span><span class="nx">feed</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feed</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>  
+          <span class="nx">parseRSS</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>  
+          <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">));</span>  
+          <span class="nx">showFeed</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>  
+        <span class="p">});</span>  
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  
+          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">cached</span><span class="dl">'</span><span class="p">);</span>  
+          <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">feed</span><span class="p">);</span>  
+          <span class="nx">showFeed</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>  
+        <span class="p">}</span>  
+      <span class="p">}</span>  
+    <span class="p">},</span> <span class="dl">'</span><span class="s1">.switch-feed</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+<p>This will keep all feed data during all the time of the session and will be
+deleted once the browser is closed.</p>
+
+<p>I’m also using localStorage to track which post were opened by using an Array
+of URL. Here the two functions that take care of tagging and telling which
+post has been read.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">function</span> <span class="nx">hasRead</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>  
+      <span class="kd">var</span> <span class="nx">read</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">read</span><span class="dl">'</span><span class="p">));</span>  
+      <span class="k">if</span> <span class="p">(</span><span class="nx">read</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">read</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>  
+      <span class="p">}</span>  
+      <span class="kd">var</span> <span class="nx">found</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>  
+      <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">read</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="nx">read</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>  
+          <span class="nx">found</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>  
+          <span class="k">break</span><span class="p">;</span>  
+        <span class="p">}</span>  
+      <span class="p">}</span>  
+      <span class="k">return</span> <span class="nx">found</span><span class="p">;</span>  
+    <span class="p">}</span>  
+    <span class="kd">function</span> <span class="nx">flagAsRead</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>  
+      <span class="kd">var</span> <span class="nx">read</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">read</span><span class="dl">'</span><span class="p">));</span>  
+      <span class="k">if</span> <span class="p">(</span><span class="nx">read</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">read</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="nx">read</span> <span class="o">=</span> <span class="p">[];</span>  
+      <span class="p">}</span>  
+      <span class="nx">read</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>  
+      <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">read</span><span class="dl">'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">read</span><span class="p">));</span>  
+    <span class="p">}</span>
+</code></pre></div></div>
+<p>The only thing missing for my needs was to display the blog post in question
+when we click on the title. This also flag the post as read and get the post
+from the cached version in sessionStorage.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">body</span><span class="dl">'</span><span class="p">).</span><span class="nx">on</span><span class="p">({</span>  
+      <span class="na">click</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>  
+        <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">.content</span><span class="dl">'</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>  
+        <span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">parent</span><span class="p">();</span>  
+        <span class="k">if</span><span class="p">(</span><span class="nx">parent</span><span class="p">.</span><span class="nx">hasClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">active</span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span>  
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">.snippet</span><span class="dl">'</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>  
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">.content</span><span class="dl">'</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>  
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">active</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">.snippet</span><span class="dl">'</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>  
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">.content</span><span class="dl">'</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>  
+          <span class="nx">parent</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">active</span><span class="dl">'</span><span class="p">);</span>  
+          <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="dl">'</span><span class="s1">url</span><span class="dl">'</span><span class="p">);</span>  
+          <span class="k">if</span> <span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">hasClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">new-post</span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span>  
+            <span class="nx">flagAsRead</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>  
+            <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">new-post</span><span class="dl">'</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="dl">'</span><span class="s1">old-post</span><span class="dl">'</span><span class="p">);</span>  
+          <span class="p">}</span>  
+        <span class="p">}</span>  
+      <span class="p">}</span>  
+    <span class="p">},</span> <span class="dl">'</span><span class="s1">.show-post</span><span class="dl">'</span><span class="p">);</span>  
+    
+	<span class="kd">function</span> <span class="nx">showFeed</span><span class="p">(</span><span class="nx">feed</span><span class="p">)</span> <span class="p">{</span>  
+      <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#blogs</span><span class="dl">'</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="dl">''</span><span class="p">);</span>  
+      <span class="nx">feed</span><span class="p">.</span><span class="nx">entries</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>  
+      <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">publishedDate</span><span class="p">);</span>  
+      <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#blogs</span><span class="dl">'</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span>  
+        <span class="dl">'</span><span class="s1">&lt;div class="blog"&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+        <span class="dl">'</span><span class="s1">  &lt;div class="show-post </span><span class="dl">'</span> <span class="o">+</span> <span class="p">(</span><span class="nx">hasRead</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">link</span><span class="p">)</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">old-post</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">new-post</span><span class="dl">'</span><span class="p">)</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">" data-url="</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">link</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">"&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+          <span class="nx">d</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> - </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">title</span> <span class="o">+</span>  
+        <span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+        <span class="dl">'</span><span class="s1">&lt;p class="snippet"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">contentSnippet</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/p&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+        <span class="dl">'</span><span class="s1">&lt;div class="content"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">content</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+        <span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span><span class="p">);</span>  
+      <span class="p">});</span>  
+      
+	  <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">.content</span><span class="dl">'</span><span class="p">).</span><span class="nx">hide</span><span class="p">();</span>  
+    <span class="p">}</span>
+</code></pre></div></div>
+<p>The showPost function is called when we click on a blog name link. This load
+all the available posts and hide the content and only display a snippet of the
+post. When we click on the post title the snippet is hidden and the content is
+shown. It’s not pretty how the HTML is render and most of the code is probably
+not optimal. The points was not to create a nice code but to get a working RSS
+reader in one file with only HTML, CSS and JavaScript.</p>
+
+<h2 id="connectica-is-born">Connectica is born</h2>
+
+<p>I named this project connectica and it’s available on
+<a href="https://github.com/dstpierre/connectica">GitHub</a> and it’s also live at
+<a href="http://connecti.ca">http://connecti.ca</a>.</p>
+
+<p><strong>This is the code without jQuery.</strong></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nx">google</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="dl">"</span><span class="s2">feeds</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">1</span><span class="dl">"</span><span class="p">);</span>  
+    <span class="kd">var</span> <span class="nx">addNewFeed</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>  
+    
+	<span class="c1">// helpers from Todd Motto: http://toddmotto.com/creating-jquery-style-functions-in-javascript-hasclass-addclass-removeclass-toggleclass/  </span>
+    <span class="kd">var</span> <span class="nx">hasClass</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="k">return</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">className</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">).</span><span class="nx">test</span><span class="p">(</span><span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">elem</span><span class="p">.</span><span class="nx">className</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">);</span>  
+    <span class="p">}</span>  
+    <span class="kd">var</span> <span class="nx">addClass</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasClass</span><span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">))</span> <span class="p">{</span>  
+            <span class="nx">elem</span><span class="p">.</span><span class="nx">className</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">className</span><span class="p">;</span>  
+        <span class="p">}</span>  
+    <span class="p">}</span>  
+    <span class="kd">var</span> <span class="nx">removeClass</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">newClass</span> <span class="o">=</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">elem</span><span class="p">.</span><span class="nx">className</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[\t\r\n]</span><span class="sr">/g</span><span class="p">,</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">)</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">;</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="nx">hasClass</span><span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">className</span><span class="p">))</span> <span class="p">{</span>  
+            <span class="k">while</span> <span class="p">(</span><span class="nx">newClass</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">className</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="nx">newClass</span> <span class="o">=</span> <span class="nx">newClass</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="dl">'</span><span class="s1"> </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">className</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">);</span>  
+            <span class="p">}</span>  
+            <span class="nx">elem</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="nx">newClass</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^</span><span class="se">\s</span><span class="sr">+|</span><span class="se">\s</span><span class="sr">+$/g</span><span class="p">,</span> <span class="dl">''</span><span class="p">);</span>  
+        <span class="p">}</span>  
+    <span class="p">}</span>  
+    <span class="c1">// my own helper function  </span>
+    <span class="kd">function</span> <span class="nx">isModern</span><span class="p">()</span> <span class="p">{</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="dl">'</span><span class="s1">querySelector</span><span class="dl">'</span> <span class="k">in</span> <span class="nb">document</span> <span class="o">&amp;&amp;</span> <span class="dl">'</span><span class="s1">addEventListener</span><span class="dl">'</span> <span class="k">in</span> <span class="nb">window</span> <span class="o">&amp;&amp;</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">forEach</span><span class="p">)</span>  
+            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>  
+        <span class="k">else</span>  
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>  
+    <span class="p">}</span>  
+    <span class="kd">var</span> <span class="nx">setVisibility</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">elm</span><span class="p">,</span> <span class="nx">visible</span><span class="p">)</span>  <span class="p">{</span>  
+        <span class="nx">elm</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="nx">visible</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">block</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">none</span><span class="dl">'</span><span class="p">;</span>  
+    <span class="p">}</span>  
+    <span class="kd">var</span> <span class="nx">changeInputColor</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">color</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">allInputs</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">input[type="text"]</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">allInputs</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="nx">i</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">backgroundcolor</span> <span class="o">=</span> <span class="nx">color</span><span class="p">;</span>  
+        <span class="p">});</span>  
+    <span class="p">}</span>  
+    <span class="kd">var</span> <span class="nx">resetInputText</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">allInputs</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">input[type="text"]</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">allInputs</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="nx">i</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>  
+        <span class="p">});</span>  
+    <span class="p">}</span>  
+    <span class="nb">window</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isModern</span><span class="p">())</span> <span class="p">{</span>  
+            <span class="k">return</span> <span class="nx">alert</span><span class="p">(</span><span class="dl">'</span><span class="s1">Your browser cannot run this app.</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="p">}</span>  
+        <span class="nx">addNewFeed</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">#add-new-feed</span><span class="dl">'</span><span class="p">);</span>  
+                  
+        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">addNewFeed</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>      
+        <span class="kd">var</span> <span class="nx">newFeed</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">#new-feed</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="nx">newFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>  
+            <span class="nx">addFeed</span><span class="p">();</span>  
+        <span class="p">});</span>  
+        <span class="kd">var</span> <span class="nx">addFeed</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">#add-feed</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="nx">addFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>  
+            <span class="nx">changeInputColor</span><span class="p">(</span><span class="dl">'</span><span class="s1">white</span><span class="dl">'</span><span class="p">);</span>  
+            <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">input[name="feed-name"]</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">;</span>  
+            <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">input[name=feed-url</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="p">;</span>  
+            <span class="k">if</span><span class="p">((</span><span class="nx">name</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">name</span> <span class="o">==</span> <span class="dl">''</span><span class="p">)</span> <span class="o">||</span>  
+                <span class="p">(</span><span class="nx">url</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">url</span> <span class="o">==</span> <span class="dl">''</span><span class="p">))</span> <span class="p">{</span>  
+                <span class="nx">changeInputColor</span><span class="p">(</span><span class="dl">'</span><span class="s1">yellow</span><span class="dl">'</span><span class="p">);</span>  
+                <span class="k">return</span><span class="p">;</span>  
+            <span class="p">}</span>  
+            <span class="kd">var</span> <span class="nx">feeds</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">feeds</span><span class="dl">'</span><span class="p">));</span>  
+            <span class="k">if</span> <span class="p">(</span><span class="nx">feeds</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feeds</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="nx">feeds</span> <span class="o">=</span> <span class="p">[];</span>  
+            <span class="p">}</span>  
+            <span class="nx">feeds</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span> <span class="na">name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span> <span class="na">url</span><span class="p">:</span> <span class="nx">url</span> <span class="p">});</span>  
+            <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">feeds</span><span class="dl">'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">feeds</span><span class="p">));</span>  
+            <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">addNewFeed</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>  
+            <span class="nx">resetInputText</span><span class="p">();</span>  
+            <span class="nx">loadFeeds</span><span class="p">();</span>  
+        <span class="p">});</span>  
+        <span class="nx">loadFeeds</span><span class="p">();</span>  
+    <span class="p">};</span>  
+    <span class="kd">function</span> <span class="nx">addFeed</span><span class="p">()</span> <span class="p">{</span>  
+        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">addNewFeed</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>  
+        <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">input[name=feed-name</span><span class="dl">'</span><span class="p">).</span><span class="nx">focus</span><span class="p">();</span>  
+    <span class="p">}</span>  
+    <span class="kd">function</span> <span class="nx">loadFeeds</span><span class="p">()</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">#feed-list</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="nx">list</span><span class="p">.</span><span class="nx">innerText</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>  
+        <span class="kd">var</span> <span class="nx">feeds</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">feeds</span><span class="dl">'</span><span class="p">));</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="nx">feeds</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feeds</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="nx">feeds</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="nx">addFeed</span><span class="p">();</span>  
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  
+            <span class="kd">var</span> <span class="nx">toRemove</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.switch-feed</span><span class="dl">'</span><span class="p">);</span>  
+            <span class="k">if</span> <span class="p">(</span><span class="nx">toRemove</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">toRemove</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">toRemove</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">toRemove</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>  
+                    <span class="nx">l</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">);</span>  
+                <span class="p">});</span>  
+            <span class="p">}</span>  
+            <span class="nx">toRemove</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.delete-feed</span><span class="dl">'</span><span class="p">);</span>  
+            <span class="k">if</span> <span class="p">(</span><span class="nx">toRemove</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">toRemove</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">toRemove</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">toRemove</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>  
+                    <span class="nx">l</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">);</span>  
+                <span class="p">});</span>  
+            <span class="p">}</span>  
+            <span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>  
+            <span class="nx">feeds</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="nx">buffer</span> <span class="o">+=</span>  
+                    <span class="dl">'</span><span class="s1">&lt;span class="feed" data-url="</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">url</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">"&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+                    <span class="dl">'</span><span class="s1">  &lt;a href="#" class="switch-feed"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/a&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+                    <span class="dl">'</span><span class="s1">  &lt;a href="#" class="delete-feed"&gt;X&lt;/a&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+                    <span class="dl">'</span><span class="s1">&lt;/span&gt;</span><span class="dl">'</span><span class="p">;</span>  
+            <span class="p">});</span>  
+            <span class="nx">list</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">;</span>  
+            <span class="kd">var</span> <span class="nx">items</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.switch-feed</span><span class="dl">'</span><span class="p">);</span>  
+            <span class="k">if</span> <span class="p">(</span><span class="nx">items</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">items</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">items</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>  
+                    <span class="nx">l</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>  
+                        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>  
+                        <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">data-url</span><span class="dl">'</span><span class="p">);</span>  
+                        <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>  
+                        <span class="k">if</span> <span class="p">(</span><span class="nx">feed</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">feed</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>  
+                            <span class="nx">parseRSS</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>  
+                                <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">feed</span><span class="p">));</span>  
+                                <span class="nx">showFeed</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">feed</span><span class="p">);</span>  
+                            <span class="p">});</span>  
+                        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  
+                            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">cached</span><span class="dl">'</span><span class="p">);</span>  
+                            <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">feed</span><span class="p">);</span>  
+                            <span class="nx">showFeed</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>  
+                        <span class="p">}</span>  
+                <span class="p">});</span>  
+            <span class="p">}</span>  
+            <span class="nx">items</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.delete-feed</span><span class="dl">'</span><span class="p">);</span>  
+            <span class="k">if</span> <span class="p">(</span><span class="nx">items</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">items</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">items</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">l</span><span class="p">)</span> <span class="p">{</span>  
+                    <span class="nx">l</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>  
+                        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>  
+                        <span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">;</span>  
+                        <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">data-url</span><span class="dl">'</span><span class="p">);</span>  
+                        <span class="nx">parent</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="nx">parent</span><span class="p">);</span>  
+                        <span class="kd">var</span> <span class="nx">feeds</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">feeds</span><span class="dl">'</span><span class="p">));</span>  
+                        <span class="k">if</span> <span class="p">(</span><span class="nx">feeds</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">feeds</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>  
+                            <span class="kd">var</span> <span class="nx">newFeeds</span> <span class="o">=</span> <span class="p">[];</span>  
+                            <span class="nx">feeds</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>      
+                                <span class="k">if</span> <span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">url</span> <span class="o">!=</span> <span class="nx">url</span><span class="p">)</span>  
+                                    <span class="nx">newFeeds</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">f</span><span class="p">);</span>  
+                            <span class="p">});</span>  
+                            <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">feeds</span><span class="dl">'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">newFeeds</span><span class="p">));</span>  
+                        <span class="p">}</span>  
+                                  
+                    <span class="p">});</span>      
+                <span class="p">});</span>  
+            <span class="p">}</span>  
+        <span class="p">}</span>  
+    <span class="p">}</span>  
+    <span class="kd">function</span> <span class="nx">showFeed</span><span class="p">(</span><span class="nx">feed</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">blogs</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">#blogs</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="kd">var</span> <span class="nx">posts</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.show-post</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="nx">posts</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">posts</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">posts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">posts</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="nx">p</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">);</span>  
+            <span class="p">});</span>  
+        <span class="p">}</span>  
+        <span class="nx">blogs</span><span class="p">.</span><span class="nx">innerText</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>  
+        <span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>  
+        <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">feed</span><span class="p">.</span><span class="nx">entries</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">publishedDate</span><span class="p">);</span>  
+            <span class="nx">buffer</span> <span class="o">+=</span>   
+                <span class="dl">'</span><span class="s1">&lt;div class="blog"&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+                <span class="dl">'</span><span class="s1">  &lt;div class="show-post </span><span class="dl">'</span> <span class="o">+</span> <span class="p">(</span><span class="nx">hasRead</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">link</span><span class="p">)</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">old-post</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">new-post</span><span class="dl">'</span><span class="p">)</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">" data-url="</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">link</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">"&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+                    <span class="nx">d</span><span class="p">.</span><span class="nx">toDateString</span><span class="p">()</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> - </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">title</span> <span class="o">+</span>  
+                <span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+                <span class="dl">'</span><span class="s1">&lt;p class="snippet"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">contentSnippet</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/p&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+                <span class="dl">'</span><span class="s1">&lt;div class="content" style="display: none;"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">f</span><span class="p">.</span><span class="nx">content</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span> <span class="o">+</span>  
+                <span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span><span class="p">;</span>  
+        <span class="p">});</span>  
+        <span class="nx">blogs</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">;</span>  
+        <span class="nx">posts</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.show-post</span><span class="dl">'</span><span class="p">);</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="nx">posts</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">posts</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">posts</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">posts</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="nx">p</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>  
+                    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>  
+                    <span class="kd">var</span> <span class="nx">contents</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.content</span><span class="dl">'</span><span class="p">);</span>  
+                    <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">contents</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>  
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>  
+                    <span class="p">});</span>  
+                    <span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">;</span>  
+                    <span class="kd">var</span> <span class="nx">snippet</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">.snippet</span><span class="dl">'</span><span class="p">);</span>  
+                    <span class="kd">var</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">.content</span><span class="dl">'</span><span class="p">);</span>  
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">hasClass</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="dl">'</span><span class="s1">active</span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span>  
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">snippet</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>  
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">content</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>  
+                        <span class="nx">removeClass</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="dl">'</span><span class="s1">active</span><span class="dl">'</span><span class="p">);</span>  
+                    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">snippet</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>  
+                        <span class="nx">setVisibility</span><span class="p">(</span><span class="nx">content</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>  
+                        <span class="nx">addClass</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="dl">'</span><span class="s1">active</span><span class="dl">'</span><span class="p">);</span>  
+                        <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">data-url</span><span class="dl">'</span><span class="p">);</span>  
+                        <span class="k">if</span> <span class="p">(</span><span class="nx">hasClass</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="dl">'</span><span class="s1">new-post</span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span>  
+                            <span class="nx">flagAsRead</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>  
+                            <span class="nx">removeClass</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="dl">'</span><span class="s1">new-post</span><span class="dl">'</span><span class="p">);</span>  
+                            <span class="nx">addClass</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="dl">'</span><span class="s1">old-post</span><span class="dl">'</span><span class="p">);</span>  
+                        <span class="p">}</span>  
+                    <span class="p">}</span>  
+                <span class="p">});</span>  
+            <span class="p">});</span>  
+        <span class="p">}</span>  
+    <span class="p">}</span>  
+    <span class="kd">function</span> <span class="nx">flagAsRead</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">read</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">read</span><span class="dl">'</span><span class="p">));</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="nx">read</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">read</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="nx">read</span> <span class="o">=</span> <span class="p">[];</span>  
+        <span class="p">}</span>  
+        <span class="nx">read</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>  
+        <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">read</span><span class="dl">'</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">read</span><span class="p">));</span>  
+    <span class="p">}</span>  
+    <span class="kd">function</span> <span class="nx">hasRead</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">read</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">'</span><span class="s1">read</span><span class="dl">'</span><span class="p">));</span>  
+        <span class="k">if</span> <span class="p">(</span><span class="nx">read</span> <span class="o">==</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">read</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>  
+        <span class="p">}</span>  
+        <span class="kd">var</span> <span class="nx">found</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>  
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">read</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="k">if</span> <span class="p">(</span><span class="nx">read</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>  
+                <span class="nx">found</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>  
+                <span class="k">break</span><span class="p">;</span>  
+            <span class="p">}</span>  
+        <span class="p">}</span>  
+        <span class="k">return</span> <span class="nx">found</span><span class="p">;</span>  
+    <span class="p">}</span>  
+    <span class="kd">function</span> <span class="nx">parseRSS</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">google</span><span class="p">.</span><span class="nx">feeds</span><span class="p">.</span><span class="nx">Feed</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>  
+        <span class="nx">feed</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">callback</span><span class="p">);</span>  
+    <span class="p">}</span>  
+    <span class="kd">function</span> <span class="nx">debugObject</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="kd">var</span> <span class="nx">keys</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>  
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>  
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">keys</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>  
+        <span class="p">}</span>  
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="the-queryselector-and-queryselectorall">The querySelector and querySelectorAll</h2>
+
+<p>I’ve almost switch 1-for-1 the jQuery selector with the document.querySelector
+and document.querySelectorAll. I find this extremely confortable after a
+couple of minutes. I might not use this the proper way, but at first I tried
+to to forEach directly on what the function querySelectorAll return. But I was
+getting “Object does not support forEach”. So I ended up doing that trick, but
+I would prefer another way, clearly I’m doing something wrong here.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">.class-name</span><span class="dl">'</span><span class="p">);</span>      
+    <span class="c1">// this work  </span>
+    <span class="p">[].</span><span class="nx">forEach</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>  
+      <span class="nx">item</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">this work</span><span class="dl">'</span><span class="p">;</span>  
+    <span class="p">});</span>  
+    <span class="c1">//this does not work  </span>
+    <span class="nx">list</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>  
+      <span class="nx">item</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">this work</span><span class="dl">'</span><span class="p">;</span>  
+    <span class="p">});</span>
+</code></pre></div></div>
+
+<p><em>If someone can explain why the second block is not working, that would be
+appreciated.</em></p>
+
+<h2 id="event-listeners">Event listeners</h2>
+
+<p>Adding and removing event on element is as simple as that:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">var</span> <span class="nx">button</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">#add-feed</span><span class="dl">'</span><span class="p">);</span>      
+    <span class="nx">button</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>  
+    <span class="p">});</span>  
+    <span class="c1">// removing the event  </span>
+    <span class="nx">button</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">);</span> 
+</code></pre></div></div>
+
+<p>The rest of the adventure removing jQuery was just small thing (for this
+simple app that is). Like getting the parent of an element with .parentNode.
+Checking, adding and removing CSS class, I took helper function from <a href="http://toddmotto.com/creating-jquery-style-functions-in-javascript-
+hasclass-addclass-removeclass-toggleclass/">Todd
+Motto</a>.</p>
+
+<p>At the end the first iteration was fun, but removing jQuery as a challenge was
+more challenging and entertaining. And this is exactly what I’m after now.</p>
+:ET

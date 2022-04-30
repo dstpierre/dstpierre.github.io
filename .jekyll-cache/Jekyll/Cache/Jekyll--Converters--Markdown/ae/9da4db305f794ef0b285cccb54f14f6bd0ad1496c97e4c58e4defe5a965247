@@ -1,0 +1,331 @@
+I"�T<h2 id="ive-recently-migrated-a-react-component">I’ve recently migrated a <a href="https://facebook.github.io/react/">React</a> component</h2>
+<p>package named <a href="https://github.com/dstpierre/react-trix">react-trix</a> to
+<a href="https://www.typescriptlang.org/">TypeScript</a> and wanted to talk about the
+experience of creating anNPM package in TypeScript.</p>
+
+<p>I’m not here to convinced you to start using TypeScript,
+<a href="https://flow.org/">Flow</a> or [insert name of latest JavaScript type checker]
+compiler. <a href="https://medium.com/u/8e9fa353daf3">Jason Dreyzehner</a> wrote an
+excellent article if you want to know more about <a href="https://medium.freecodecamp.com/its-time-to-give-typescript-another-chance-2caaf7fabe61">giving TypeScript a chance
+here</a>.</p>
+
+<p>I’ve been using TypeScript for ~3 years now but I never published a public NPM
+package with it and I could not find much in terms of recent article other than
+<a href="https://medium.com/@mweststrate/how-to-create-strongly-typed-npm-modules-1e1bda23a7f4">this
+one</a>
+from <a href="https://medium.com/@mweststrate">Michel Weststrate</a> for TypeScript &lt; 2.0.
+So here we are.</p>
+
+<p>You can clone this repository if you want to follow from your code editor. This
+is a quick starting point project where you can simply edit the <code class="highlighter-rouge">package.json</code>
+file, run <code class="highlighter-rouge">npm install</code>and create your TypeScript React component(s).</p>
+
+<h3 id="the-project-structure">The project structure</h3>
+
+<p>I normally create a project directorywith the following directories/files
+structure for NPM packages.</p>
+
+<p>```shell    .
+├── lib
+├── LICENSE
+├── main.js
+├── package.json
+├── README.md
+├── src
+├── tests
+├── test.sh
+├── tsconfig.json</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Let’s install TypeScript:
+
+`npm install typescript -g`
+
+You might need to use `sudo`if you’re not using
+[NVM](https://github.com/creationix/nvm), but I would suggest you start doing it
+if you don’t ;), this is out of scope of this article though, but NVM make it
+easier to have side-by-side Node versions installed in your user space.
+
+At minimum you’ll need React and ReactDOM packages with their appropriate
+typings packages:
+
+`npm install react react-dom @types/react @types/react-dom --save-dev`
+
+The `@types/react` and `@types/react-dom` are useful to help the TypeScript
+compiler understand external libraries and also let your code editor offer you a
+better experience. I’m using [vscode](https://code.visualstudio.com/) and the
+TypeScript and Go experiences for writing code is what I enjoy at the moment.
+
+### The TypeScript configuration file
+
+It’s easier to have a TypeScript configuration file when calling the TypeScript
+compiler `tsc`rather than having to supply the arguments via the CLI. The file
+is named `tsconfig.json` and will be loaded automatically.
+
+```json
+{
+	"compilerOptions": {
+		"outDir": "./lib",
+		"target": "es5",
+		"module": "commonjs",
+		"noImplicitAny": true,
+		"removeComments": true,
+		"declaration": true,
+		"sourceMap": true,
+		"jsx": "react"
+	},
+	"include": [
+		"./src/**/*.tsx",
+		"./src/**/*.ts"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}
+</code></pre></div></div>
+
+<p>To stay compatible with the “world” our TypeScript source files will need to be
+compiled to JavaScript so when other developers install and use our package they
+will in fact import a standard <a href="https://en.wikipedia.org/wiki/ECMAScript">EcmaScript
+5</a> source code.</p>
+
+<p>The <code class="highlighter-rouge">target</code> is set to <code class="highlighter-rouge">es5</code> meaning that we want the compiler to produce code
+compatible with this standard and we’re also saying that our <code class="highlighter-rouge">module</code> will be
+the <code class="highlighter-rouge">commonjs</code> same as Node.</p>
+
+<p>There’s two important properties in here, the <code class="highlighter-rouge">declaration</code> and the <code class="highlighter-rouge">jsx</code>.</p>
+
+<p>The <code class="highlighter-rouge">jsx</code> option tells the compiler we’re going to have React’s JSX in our
+TypeScript source.</p>
+
+<p>The <code class="highlighter-rouge">declaration</code> indicates that we want to generate declaration files so other
+TypeScript developers will have a nicer experience when they install our
+package.</p>
+
+<p>Remember those <code class="highlighter-rouge">@types/react</code> packages we installed previously for React? Our
+package will include its own TypeScript definition files <code class="highlighter-rouge">d.ts</code>. They accomplish
+the same goals as the <code class="highlighter-rouge">@types/react</code> for example, but are part of our NPM
+package.</p>
+
+<h3 id="a-first-typescript-react-component">A first TypeScript React component</h3>
+
+<p>It’s time to write a first React component in TypeScript, we’ll write a simple
+component for now.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">React</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">react</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">Hello</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="p">{},</span> <span class="p">{}</span><span class="o">&gt;</span> <span class="p">{</span>
+	<span class="kd">constructor</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">super</span><span class="p">();</span>
+	<span class="p">}</span>
+	<span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">Hello</span> <span class="nx">world</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span><span class="err">;
+</span>	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Alright, time to test our component. And no we will not use another project, at
+least not for now. It’s not time to test our package, it’s time to test our
+React component and we will also use <strong>TypeScript</strong> to do that.</p>
+
+<p>We’ll start by installing the needed packages:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-addons-test-utils mocha --save-dev
+</code></pre></div></div>
+
+<p>Testing React component is out of scope of this article. But this is part of
+publishing an NPM package I think. So I’m not going to talk much about why I’m
+using <a href="https://mochajs.org/">Mocha</a> instead of
+<a href="https://facebook.github.io/jest/docs/tutorial-react.html">Jest</a> etc. I’m a
+strong believer in:</p>
+
+<blockquote>
+  <p>use whatever languages, frameworks and tools you like and #JFDI.</p>
+</blockquote>
+
+<p>Once you have those packages installed we will first create a TypeScript
+configuration file inside our <code class="highlighter-rouge">tests</code> directory:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="nl">"compilerOptions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+		</span><span class="nl">"outDir"</span><span class="p">:</span><span class="w"> </span><span class="s2">"./"</span><span class="p">,</span><span class="w">
+		</span><span class="nl">"target"</span><span class="p">:</span><span class="w"> </span><span class="s2">"es5"</span><span class="p">,</span><span class="w">
+		</span><span class="nl">"module"</span><span class="p">:</span><span class="w"> </span><span class="s2">"commonjs"</span><span class="p">,</span><span class="w">
+		</span><span class="nl">"noImplicitAny"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+		</span><span class="nl">"removeComments"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+		</span><span class="nl">"sourceMap"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+		</span><span class="nl">"jsx"</span><span class="p">:</span><span class="w"> </span><span class="s2">"react"</span><span class="w">
+	</span><span class="p">},</span><span class="w">
+	</span><span class="nl">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+		</span><span class="s2">"./*.tsx"</span><span class="p">,</span><span class="w">
+		</span><span class="s2">"./*.ts"</span><span class="w">
+	</span><span class="p">],</span><span class="w">
+		</span><span class="nl">"exclude"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+		</span><span class="s2">"node_modules"</span><span class="w">
+	</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>I’m often using <code class="highlighter-rouge">npm test</code> with a bash script to run my tests, so here’s my
+typical script:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="nb">cd </span>tests
+tsc
+<span class="nb">cd</span> ..
+./node_modules/.bin/mocha tests/tests/<span class="k">*</span>_test.js
+<span class="nb">exit </span>0
+</code></pre></div></div>
+
+<p>Basically we are running the TypeScript compiler against our <code class="highlighter-rouge">_test</code> test files
+and we run Mocha on the generated JavaScript files.</p>
+
+<p>Let’s create a first test for our <code class="highlighter-rouge">Hello</code> component.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">React</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">react</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">expect</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">chai</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">shallow</span><span class="p">,</span> <span class="nx">mount</span><span class="p">,</span> <span class="nx">render</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">enzyme</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">spy</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">sinon</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Hello</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">../src/hello</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="nx">describe</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;Hello /&gt;</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+	<span class="nx">it</span><span class="p">(</span><span class="dl">"</span><span class="s2">renders the the h1</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+		<span class="kd">const</span> <span class="nx">wrapper</span> <span class="o">=</span> <span class="nx">shallow</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Hello</span> <span class="o">/&gt;</span><span class="p">);</span>
+		<span class="nx">expect</span><span class="p">(</span><span class="nx">wrapper</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="dl">"</span><span class="s2">h1</span><span class="dl">"</span><span class="p">)).</span><span class="nx">to</span><span class="p">.</span><span class="nx">have</span><span class="p">.</span><span class="nx">length</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+	<span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Thanks to <a href="https://github.com/airbnb/enzyme">Enzyme</a> it’s easy to test our React
+component without having to use a full/head-less browser. Depending on the
+complexity of your component you might need to use the <code class="highlighter-rouge">mount</code> function instead
+of <code class="highlighter-rouge">shallow</code> and use something like <code class="highlighter-rouge">jsdom</code> to emulate a full DOM for React.</p>
+
+<p>Our <code class="highlighter-rouge">Hello</code> component is simple enough that we’re able to test it via <code class="highlighter-rouge">shallow</code>
+and running <code class="highlighter-rouge">npm test</code> on a terminal shows us our passing test.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>dstpierre@roadmap]: ~/projects/tmp&gt;<span class="nv">$ </span>npm <span class="nb">test</span>
+
+<span class="o">&gt;</span> tmp@1.0.0 <span class="nb">test</span> /home/dstpierre/projects/tmp
+<span class="o">&gt;</span> ./test.sh
+
+&lt;Hello /&gt;
+		✓ renders the the h1
+
+1 passing <span class="o">(</span>11ms<span class="o">)</span>
+</code></pre></div></div>
+
+<p>So Enzyme and Mocha allow us to develop our React component(s) and not have to
+worry about packaging and testing on another project or a debug HTML page.</p>
+
+<p>This pretty much resume the flow of how you can develop/test your React
+component:</p>
+
+<ol>
+  <li>You create <code class="highlighter-rouge">.tsx</code> and <code class="highlighter-rouge">.ts</code> files in the <code class="highlighter-rouge">src</code> directory</li>
+  <li>You create tests in the <code class="highlighter-rouge">tests</code> directory for your TypeScript code</li>
+  <li>You run your tests and start at #1 until your package is at a place where you
+want to see it in an external app.</li>
+</ol>
+
+<h3 id="testing-the-installation-of-our-package">Testing the installation of our package</h3>
+
+<p>Running <code class="highlighter-rouge">tsc</code> on the root of our project creates the standard EcmaScript 5
+JavaScript files into the <code class="highlighter-rouge">lib</code> directory.</p>
+
+<p>But before someone can installs our package and imports our <code class="highlighter-rouge">Hello</code> component we
+need to make sure it’s exported and that our package.json file has an entry for
+the <code class="highlighter-rouge">main</code> option.</p>
+
+<p>I usually simply create a <code class="highlighter-rouge">main.js</code> at the root of my project with the following
+code:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">exports</span><span class="p">.</span><span class="nx">Hello</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">"</span><span class="s2">./lib/hello</span><span class="dl">"</span><span class="p">).</span><span class="nx">Hello</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Pointing to this file in <code class="highlighter-rouge">package.json</code>:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="err">...</span><span class="w">
+	</span><span class="nl">"main"</span><span class="p">:</span><span class="w"> </span><span class="s2">"main.js"</span><span class="w">
+	</span><span class="err">...</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We also need to specify which files we want included in the package. We set this
+via the <code class="highlighter-rouge">files</code> entry of <code class="highlighter-rouge">package.json</code>:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="err">...</span><span class="w">
+	
+	</span><span class="err">...</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>And lastly our TtypeScript definition file via the <code class="highlighter-rouge">types</code> entry of
+<code class="highlighter-rouge">package.json</code> :</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="err">...</span><span class="w">
+	</span><span class="nl">"types"</span><span class="p">:</span><span class="w"> </span><span class="s2">"./lib/hello.d.ts"</span><span class="w">
+	</span><span class="err">...</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p><em>This is just how I like to work, there’s tons of way to do this, so please if
+you don’t find this to your taste, adjust to whatever makes you happy.</em></p>
+
+<p>In my <code class="highlighter-rouge">package.json</code> file I usually add a <code class="highlighter-rouge">prepublish</code> entry on the <code class="highlighter-rouge">scripts</code>
+section like this:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+	</span><span class="err">...</span><span class="w">
+	</span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+		</span><span class="s2">"build"</span><span class="err">:</span><span class="w"> </span><span class="s2">"rm ./lib/* &amp;&amp; tsc"</span><span class="p">,</span><span class="w">
+		</span><span class="s2">"prepublish"</span><span class="err">:</span><span class="w"> </span><span class="s2">"npm run build"</span><span class="p">,</span><span class="w">
+		</span><span class="s2">"test"</span><span class="err">:</span><span class="w"> </span><span class="s2">"./test.sh"</span><span class="w">
+	</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The <code class="highlighter-rouge">prepublish</code> entry will be running every time the npm package is publishing
+via <code class="highlighter-rouge">npm publish</code> or creates a local package via <code class="highlighter-rouge">npm pack</code>.</p>
+
+<p>When I want to test my package I just create it with <code class="highlighter-rouge">npm pack</code> this creates a
+<code class="highlighter-rouge">.tgz</code> file that I can install in an external app:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$&gt;</span> npm <span class="nb">install</span> ../my-component/my-component-1.0.0.tgz <span class="nt">--save</span>
+</code></pre></div></div>
+
+<p>And now on this testing external app we’re able to use the component as normal
+via TypeScript or standard es2015:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Hello</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">my-component</span><span class="dl">"</span><span class="p">;</span>
+<span class="p">...</span>
+<span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="p">(</span>
+		<span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+			<span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">external</span> <span class="nx">app</span><span class="o">&lt;</span><span class="sr">/p</span><span class="err">&gt;
+</span>			<span class="o">&lt;</span><span class="nx">Hello</span> <span class="o">/&gt;</span>
+		<span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>	<span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="thats-it">That’s it!</h3>
+
+<p>We have a fully testable TypeScript npm package with one or multiple React
+components ready to be installed locally or published via the public NPM
+repository.</p>
+
+<p>You might want to check out <code class="highlighter-rouge">npm link</code> if you would prefer not to manually pack
+the component and install it each time. Depending on what you are building this
+might be a smoother flow. I tend to rely on Enzyme for testing and occasionally
+test the package in an external app, so the <code class="highlighter-rouge">npm pack</code> and <code class="highlighter-rouge">npm install</code> is not
+a big thing for me.</p>
+
+<blockquote>
+  <p>Make sure to click the like button if you have appreciated this tutorial.</p>
+</blockquote>
+
+:ET

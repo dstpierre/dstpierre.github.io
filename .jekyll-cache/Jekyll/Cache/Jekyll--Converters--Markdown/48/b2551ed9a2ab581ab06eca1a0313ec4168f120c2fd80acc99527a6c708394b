@@ -1,0 +1,17 @@
+I"<blockquote>
+  <p>Please note that this video was using the first beta version of SignalR, lots of things changes 
+since that day.</p>
+</blockquote>
+
+<p>This is the first post of a series on the rewrite of <a href="http://livechatstarterkit.codeplex.com">LiveChat Starter
+Kit</a> to version 2 using
+<a href="http://signalr.net/">SignalR</a> as the communication mechanism.</p>
+
+<iframe width="960" height="720" src="//www.youtube.com/embed/Mmq9yLXVqcU" frameborder="0"> </iframe>
+
+<p>If you would like to join the project do not hesitate. Developing with SignalR
+is a lot of fun I must say.</p>
+
+<p>Technorati Tags: <a href="http://technorati.com/tags/Open+Source">Open Source</a>,<a href="http://technorati.com/tags/LCSK">LCSK</a>,<a href="http://technorati.com/tags/SignalR">SignalR</a></p>
+
+:ET

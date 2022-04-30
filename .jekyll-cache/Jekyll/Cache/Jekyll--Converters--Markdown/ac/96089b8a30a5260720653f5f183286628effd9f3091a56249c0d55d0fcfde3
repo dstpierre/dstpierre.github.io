@@ -1,0 +1,60 @@
+I"
+<p>This release is a small one. Since the Microsoft.AspNet.SignalR package is now
+a production ready one, I’ve updated the
+<a href="http://livechatstarterkit.codeplex.com">LCSK</a> NuGet package to use that
+dependency.</p>
+
+<h3 id="some-changes">Some Changes</h3>
+
+<p>The 1.0.0 production release introduce a couple of changes that broke the
+latest code from the visitor experience’s video.</p>
+
+<p>The main changes was in the way javascript client code call server methods and
+the way the server hub call client side function.</p>
+
+<p><strong>Before the changes</strong></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>myhub.DoSomething();  
+myhub.clientDoOtherThing = function() { }
+</code></pre></div></div>
+
+<p><strong>Now with the 1.0.0</strong></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>myhub.server.DoSomething();  
+myhub.client.clientDoOtherThing = function() { }
+</code></pre></div></div>
+
+<p>Not a huge changes, but still, enough to break the javascript code files.</p>
+
+<p><strong>On the server, you need to call the client methods like this:</strong></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Clients.Client(connectionId).clientDoOtherThing();
+</code></pre></div></div>
+
+<p>The basics functionalities are currently working nicely on LCSK. The following
+months will be some small improvement and addition of features.</p>
+
+<h3 id="available-on-github">Available on GitHub</h3>
+
+<p>I’m currently using both CodePlex and GitHub to host the source code of LCSK.
+Since the project is hosted at CodePlex since 2007, I don’t want to loose any
+SEO / traffic juice I already have. But on the other hand, I’m more attracted
+by GitHub lately so I’m using both for now. Here are the links:</p>
+
+<p>GitHub: <a href="https://github.com/dstpierre/lcsk">https://github.com/dstpierre/lcsk</a></p>
+
+<p>CodePlex: <a href="http://livechatstarterkit.c
+odeplex.com">http://livechatstarterkit.codeplex.com</a></p>
+
+<p>&amp;nbsp_place_holder;</p>
+
+<p>As always, feedback are appreciated. If you want to contribute please make
+sure you use the GitHub reposotory.</p>
+
+<p>Technorati Tags: <a href="http://technorati.com/tags/LCSK">LCSK</a>,<a href="http://technorati.com/tags/Live+Chat">Live
+Chat</a>,<a href="http://technorati.com/tags/Live+Support">Live
+Support</a>,<a href="http://technor
+ati.com/tags/Open+Source">Open Source</a>,<a href="http://technorati.com/tags/C%23">C#</a>,<a href="http
+://technorati.com/tags/SignalR">SignalR</a></p>
+
+:ET

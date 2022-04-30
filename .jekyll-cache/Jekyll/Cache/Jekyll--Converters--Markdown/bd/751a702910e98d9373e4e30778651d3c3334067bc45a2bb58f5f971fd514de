@@ -1,0 +1,23 @@
+I"�<p><img src="/images/vscode.png" alt="Visual Studio Code" title="Visual Studio Code" /></p>
+
+<p>What an announcement Microsoft did at the Build conference this morning. There has been lots of shocking announcements
+to be honest.</p>
+
+<h3 id="visual-studio-code-for-mac-osx-and-linux">Visual Studio Code for Mac OSX and Linux</h3>
+
+<p>I was really intrigued to try this one out, a lightweight code editor with multiple languages supported and the
+Visual Studio intellisense. I’ve installed it on my Arch Linux.</p>
+
+<p>Just <a href="https://code.visualstudio.com/Download">download</a> and unzip the file, it’s an executing binary just started
+it <code class="highlighter-rouge">./Code</code> and here it was.</p>
+
+<h3 id="small-footprint-but-interesting-features">Small footprint but interesting features</h3>
+
+<p>I’ve tried it very quickly for JavaScript and C# intellisense. Seems to be pretty good. And has they’ve said
+it’s not only auto-completion but really intellisense.</p>
+
+<p>This is not a review in any case, but I just needed to try it out for myself.</p>
+
+<p>Normally I use a combinasion of Atom, WebStorm, Vim, PyCharm and Visual Studio. This VSCode is worth investigating
+where it can fit.</p>
+:ET
