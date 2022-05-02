@@ -12,13 +12,13 @@ find useful and that I'll have a blast maintaining and growing.
 
 ### Current products
 
-[CTO as a service](/cto-as-a-service) - I can help build your SaaS affordably.
+[Parle](https://parle.io) - Customer communication platform written in Go.
 
-[Pragmatic Elm web apps](/videos/pragmatic-elm-web-apps) - Work in progress video course on Elm.
+[Build SaaS apps in Go](https://buildsaasappingo.com) - Book/online course on 
+building SaaS in Go.
 
-[ClearUser](https://clearuser.com) - Customer research tool.
-
-[Build SaaS apps in Go](https://buildsaasappingo.com) - Book on building SaaS in Go.
+[StaticBackend](https://staticbackend.com) - An open-source alternative to 
+Firebase written in Go.
 
 ### Previous products
 
@@ -39,4 +39,5 @@ Twollow - *2008*: Twitter tool to follow people with same interests.
 
 ### Need a reliable developer?
 
-I'm doing consulting here and there, mostly depending on project. Contact me if you want to chat.
+I'm doing consulting here and there, mostly depending on project. Contact me if 
+you want to chat.
